@@ -1,0 +1,29 @@
+services:
+  obs:
+    image: obs-headless:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # entrypoint: tail -f /dev/null
+    volumes:
+      - ./service-config/obs-studio/config:/root/.config/obs-studio
+    environment:
+      - DISPLAY=novnc:0.0
+    ports:
+      - 4455:4455
+    depends_on:
+      novnc:
+        condition: service_healthy
+  novnc:  
+    image: theasp/novnc:latest
+    environment:
+      # Adjust to your screen size
+      - DISPLAY_WIDTH=1600
+      - DISPLAY_HEIGHT=968
+    ports:
+      - "8080:8080"
+    healthcheck:
+        test: "wget -q --spider http://localhost:8080 || exit 1"
+        interval: 30s
+        timeout: 10s
+        retries: 3
