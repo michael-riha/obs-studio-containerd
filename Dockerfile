@@ -1,89 +1,8 @@
 # from -> https://obsproject.com/forum/attachments/dockerfile-obs-txt.104215/ 
 # original post -> https://obsproject.com/forum/threads/docker-dev-image.175843/
+ARG IMAGE_VERSION=ubuntu:24.04
 
-
-#Dockerfile for building OBS-studio with two stages. 
-#If disk space isn't a problem, you could remove
-# the second stage if you you wish
-FROM ubuntu:24.04 AS builder
-
-
-# FROM original post!
-# Setup arguments and environment variables
-# ARG PACKAGES=" \
-#     ninja-build, \
-#     pkg-config, \
-#     clang-format, \
-#     build-essential, \
-#     ccache, \
-#     git, \
-#     wget, \
-#     curl, \
-#     zsh, \
-#     libpulse-dev, \
-#     libavcodec-dev, \
-#     libavdevice-dev, \
-#     libavfilter-dev, \
-#     libavformat-dev, \
-#     libv4l2rds0, \
-#     libv4l-dev, \
-#     libavutil-dev, \
-#     libswresample-dev, \
-#     libswscale-dev, \
-#     qt6-base-dev, \
-#     qt6-base-private-dev, \
-#     libqt6svg6-dev, \
-#     qt6-wayland, \
-#     qt6-image-formats-plugins, \
-#     libx264-dev, \
-#     libcurl4-openssl-dev, \
-#     libmbedtls-dev, \
-#     libgl1-mesa-dev, \
-#     libjansson-dev, \
-#     libluajit-5.1-dev, \
-#     python3-dev, \
-#     libx11-dev, \
-#     libxcb-randr0-dev, \
-#     libxcb-shm0-dev, \
-#     libxcb-xinerama0-dev, \
-#     libxcb-composite0-dev, \
-#     libxcomposite-dev, \
-#     libxinerama-dev, \
-#     libvlccore-dev, \
-#     libvlccore9, \
-#     libvlc5, \
-#     libvlc-dev, \
-#     libxcb1-dev, \
-#     libx11-xcb-dev, \
-#     libclalsadrv-dev, \
-#     libghc-alsa-core-dev, \
-#     libalsaplayer-dev, \
-#     libxcb-xfixes0-dev, \
-#     swig, \
-#     libcmocka-dev, \
-#     libxss-dev, \
-#     libglvnd-dev, \
-#     libgles2-mesa-dev, \
-#     libwayland-dev, \
-#     librist-dev, \
-#     libsrt-openssl-dev, \
-#     libvpl-dev, \
-#     libva-drm2, \
-#     libxkbcommon-x11-dev, \
-#     libxkbcommon-dev, \
-#     libpci-dev, \
-#     libva-dev, \
-#     libvala-0.56-dev, \
-#     libffmpeg-nvenc-dev, \
-#     libpipewire-0.3-dev, \
-#     libqrcodegencpp-dev, \
-#     uthash-dev, \
-#     nlohmann-json3-dev, \
-#     libwebsocketpp-dev, \
-#     libasio-dev, \
-#     libspeexdsp-dev, \
-#     libdrm-dev" \
-
+# https://stackoverflow.com/a/53683625 An ARG instruction goes out of scope at the end of the build stage where it was defined.
 # added by Michael Riha https://github.com/obsproject/obs-studio/wiki/build-instructions-for-linux
 # Build system dependencies
 ARG BUILD_PACKAGES="\
@@ -94,12 +13,11 @@ ARG BUILD_PACKAGES="\
     clang \
     clang-format \
     build-essential \ 
-    curl \
     ccache \
     git \
     zsh"
 
-# OBS dependencies (core):
+# OBS dependencies (core): 👆️ moved from core curl, ... as needed for final stage
 ARG OBS_CORE_PACKAGES="\
     libavcodec-dev \
     libavdevice-dev \
@@ -136,7 +54,8 @@ ARG OBS_CORE_PACKAGES="\
     libpci-dev \
     libpipewire-0.3-dev \
     libqrcodegencpp-dev \
-    uthash-dev"
+    uthash-dev \
+    curl"
 
 ARG OBS_QT6_UI="\   
     qt6-base-dev \
@@ -164,22 +83,38 @@ ARG OBS_PLUGIN_DEPENDANCIES="\
     libwebsocketpp-dev \
     libasio-dev"
 
+#Dockerfile for building OBS-studio with two stages. 
+#If disk space isn't a problem, you could remove
+# the second stage if you you wish
+FROM ${IMAGE_VERSION} AS builder
+
+ARG TARGETARCH
+ENV DEBIAN_FRONTEND=noninteractive \
+    CEF_VERSION=5060
+
+# workaround since TARGETARCH is only amd64 or aarch64 but not x86_64 which is sometimes needed!
+# ARG DOWNLOAD_ARCH=$(uname -m)
+
+
+ARG BUILD_PACKAGES \
+    OBS_CORE_PACKAGES \
+    OBS_QT6_UI \
+    OBS_PLUGIN_DEPENDANCIES
 # Merge all packages into one variable
 ARG PACKAGES="${BUILD_PACKAGES} \
             ${OBS_CORE_PACKAGES} \
             ${OBS_QT6_UI} \
             ${OBS_PLUGIN_DEPENDANCIES}"
 
-# Create necessary directories
-RUN mkdir -p /tmp /home/obs-studio /usr/local/cmake-3.29.3-linux-x86_64
-
+# Create necessary directories (deprecated /usr/local/cmake-3.29.3-linux-${ARCH})
+RUN mkdir -p /tmp /home/obs-studio 
 
 # Install curl to download nanolayer
 RUN apt-get update && apt-get install -y curl wget
 
-
 # Download and extract nanolayer
-RUN curl -L "https://github.com/devcontainers-contrib/nanolayer/releases/download/v0.5.6/nanolayer-x86_64-unknown-linux-gnu.tgz" -o /tmp/nanolayer.tgz \
+RUN DOWNLOAD_ARCH=$(uname -m) && \
+    curl -L "https://github.com/devcontainers-contrib/nanolayer/releases/download/v0.5.6/nanolayer-${DOWNLOAD_ARCH}-unknown-linux-gnu.tgz" -o /tmp/nanolayer.tgz \
     && tar -xzf /tmp/nanolayer.tgz -C /usr/bin \
     && rm /tmp/nanolayer.tgz
 
@@ -204,57 +139,68 @@ RUN  apt-get update && apt-get install -y libnss3
 #     && chmod +x /opt/cmake.sh \
 #     && /opt/cmake.sh --skip-license --prefix=/usr/local --include-subdir
 
-
 # # Link CMake binaries
 # RUN ln -s /usr/local/cmake-3.29.3-linux-x86_64/bin/* /usr/local/bin/
 
-
-# Clone OBS Studio
-RUN git clone --recursive https://github.com/obsproject/obs-studio.git /home/obs-studio
-
+# Clone OBS Studio with a working commit for this project as of May 2025
+RUN git clone --recursive https://github.com/obsproject/obs-studio.git /home/obs-studio \
+       && cd /home/obs-studio \
+       git checkout bdebea3
+#LATEST ONE FAILED BUILD  --branch 31.0.3 
 
 # Download and extract CEF
-RUN wget -O /tmp/cef.tar.xz https://cdn-fastly.obsproject.com/downloads/cef_binary_5060_linux_x86_64_v3.tar.xz \
+RUN DOWNLOAD_ARCH=$(uname -m) && \
+    wget -O /tmp/cef.tar.xz https://cdn-fastly.obsproject.com/downloads/cef_binary_5060_linux_${DOWNLOAD_ARCH}_v3.tar.xz \
     && tar -xvf /tmp/cef.tar.xz -C /home \
     && rm /tmp/cef.tar.xz
 
 # potential preset https://github.com/obsproject/obs-studio/blob/0b7c1f7081941e2605f1c8bb7ce0907a3901a884/CMakePresets.json#L59-L79
 # CMake Vars - https://github.com/obsproject/obs-studio/wiki/building-obs-studio#cmake
-RUN cd /home/obs-studio && \
+RUN DOWNLOAD_ARCH=$(uname -m) && \
+    cd /home/obs-studio && \
         cmake --preset ubuntu -B docker-build \
         -DENABLE_BROWSER=ON \
         -DENABLE_BROWSER_PANELS=ON \
-        -DCEF_ROOT_DIR="/home/cef_binary_5060_linux_x86_64" \
+        -DCEF_ROOT_DIR="/home/cef_binary_5060_linux_${DOWNLOAD_ARCH}" \
         -DENABLE_WAYLAND=OFF \
-        -DQT_VERSION=6
+        -DQT_VERSION=6 \
+        -DENABLE_RELOCATABLE=ON \
+        -DENABLE_PORTABLE_CONFIG=ON \
+        -DCMAKE_INSTALL_PREFIX=/home/obs-studio/install 
         # -DENABLE_PIPEWIRE=OFF \
         # -DENABLE_AJA=0 \
         # -DENABLE_WEBRTC=0 \
         # 
-# RUN cd /home/obs-studio && \
-#         cmake -S . -B docker-build -G Ninja \
-#         -DCEF_ROOT_DIR="/home/cef_binary_5060_linux_x86_64" \
-#         -DENABLE_PIPEWIRE=OFF \
-#         -DENABLE_AJA=0 \
-#         -DENABLE_WEBRTC=0 \
-#         -DQT_VERSION=6
-        # -DENABLE_NATIVE_NVENC=OFF;
-#     fi
-
-
 
 RUN cd /home/obs-studio && \
-        cmake --build ./docker-build && cmake --install ./docker-build
+        cmake --build ./docker-build &&\
+        cmake --install ./docker-build
 
 RUN ldconfig
-
-ENTRYPOINT [ "obs" ]
-
-# FROM ubuntu:24.04 AS dev_env
+WORKDIR /home/obs-studio
+ENTRYPOINT [ "./install/bin/obs" ]
 
 
-# COPY --from=builder /home/obs-studio /home/obs-studio
-# COPY --from=builder  /usr/local/cmake-3.29.3-linux-x86_64 /usr/local/cmake-3.29.3-linux-x86_64
-# COPY --from=builder  /home/cef_binary_5060_linux_x86_64 /home/cef_binary_5060_linux_x86_64
-# COPY --from=builder /usr/bin/nanolayer /usr/bin/nanolayer
-# RUN ln -s /usr/local/cmake-3.29.3-linux-x86_64/bin/* /usr/local/bin/
+FROM ${IMAGE_VERSION} AS production
+
+WORKDIR /home/obs-studio
+
+ARG BUILD_PACKAGES \
+    OBS_CORE_PACKAGES \
+    OBS_QT6_UI \
+    OBS_PLUGIN_DEPENDANCIES
+# Install runtime dependencies & merge all packages into one variable
+ARG RUNTIME_PACKAGES="${OBS_CORE_PACKAGES} \
+            ${OBS_QT6_UI} \
+            ${OBS_PLUGIN_DEPENDANCIES}"
+RUN  apt-get update && apt-get install -y ${RUNTIME_PACKAGES}
+#libs for cef 
+RUN  apt-get update && apt-get install -y libnss3
+
+COPY --from=builder /home/obs-studio/install /home/obs-studio/install
+# # COPY --from=builder  /usr/local/cmake-3.29.3-linux-x86_64 /usr/local/cmake-3.29.3-linux-x86_64
+COPY --from=builder  /home/cef_binary_5060_linux_x86_64 /home/cef_binary_5060_linux_x86_64
+# # COPY --from=builder /usr/bin/nanolayer /usr/bin/nanolayer
+
+# https://obsproject.com/kb/launch-parameters
+ENTRYPOINT [ "./install/bin/obs", "--studio-mode" ]

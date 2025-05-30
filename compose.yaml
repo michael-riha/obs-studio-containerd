@@ -1,16 +1,29 @@
 services:
-  obs:
+  # obs:
+  #   image: obs-headless:latest
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #     target: production
+  #   entrypoint: tail -f /dev/null
+  #   volumes:
+  #     - ./service-config/obs-studio/config:/root/.config/obs-studio
+  #   environment:
+  #     - DISPLAY=novnc:0.0
+  #   ports:
+  #     - 4455:4455
+  #   depends_on:
+  #     novnc:
+  #       condition: service_healthy
+  obs-builder:
     image: obs-headless:latest
     build:
       context: .
       dockerfile: Dockerfile
+      # target: builder
     # entrypoint: tail -f /dev/null
-    volumes:
-      - ./service-config/obs-studio/config:/root/.config/obs-studio
     environment:
       - DISPLAY=novnc:0.0
-    ports:
-      - 4455:4455
     depends_on:
       novnc:
         condition: service_healthy
@@ -20,10 +33,22 @@ services:
       # Adjust to your screen size
       - DISPLAY_WIDTH=1600
       - DISPLAY_HEIGHT=968
+      - RUN_XTERM=no
+      - RUN_FLUXBOX=no
     ports:
       - "8080:8080"
     healthcheck:
         test: "wget -q --spider http://localhost:8080 || exit 1"
-        interval: 30s
-        timeout: 10s
+        interval: 10s
+        timeout: 6s
         retries: 3
+  dive:
+    image: wagoodman/dive:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 9900:9900
+    environment:
+      - DIVE_SOURCE=/var/run/docker.sock
+    entrypoint: tail -f /dev/null
+    # entrypoint: dive server --port 9900
