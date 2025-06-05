@@ -17,13 +17,21 @@ services:
   #       condition: service_healthy
   obs-builder:
     image: obs-headless:latest
+    hostname: obs
     build:
       context: .
       dockerfile: Dockerfile
       # target: builder
     # entrypoint: tail -f /dev/null
+    volumes:
+      - ./service-config/obs-studio/config:/root/.config/obs-studio
+      - ./scripts:/opt/scripts
     environment:
       - DISPLAY=novnc:0.0
+    ports:
+      - 5678:5678 # debugpy port for python script debugging
+      - 4455:4455 # websocket port
+      - 2000:2000 #SRT input port
     depends_on:
       novnc:
         condition: service_healthy
@@ -42,6 +50,28 @@ services:
         interval: 10s
         timeout: 6s
         retries: 3
+  ffmpeg:
+    image: jrottenberg/ffmpeg:7.1.1-ubuntu2404-edge
+    entrypoint: tail -f /dev/null
+    ports: 
+      - 1936-1999:1936-1999
+      - 2001-2100:2001-2100
+  rtmp:
+    image: jrottenberg/ffmpeg:7.1.1-ubuntu2404-edge
+    # entrypoint: tail -f /dev/null
+    entrypoint: bash -c /opt/rtmp/rtmp-server.sh
+    volumes:
+       - ./service-config/rtmp/output:/opt/rtmp/output
+       - ./service-config/rtmp/rtmp-server.sh:/opt/rtmp/rtmp-server.sh
+    ports: 
+      - 1935:1935
+  frontend:
+    image: nginx:1.28.0-perl
+    volumes:
+      - ./frontend/index.html:/usr/share/nginx/html/index.html
+      - ./service-config/rtmp/output:/usr/share/nginx/html/output
+    ports:
+      - 8088:80
   dive:
     image: wagoodman/dive:latest
     volumes:

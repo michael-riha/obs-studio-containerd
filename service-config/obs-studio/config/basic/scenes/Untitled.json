@@ -11,17 +11,72 @@
         {
             "prev_ver": 520159232,
             "name": "Scene",
-            "uuid": "50b6257d-b379-45cd-9251-f7c2e61d9e36",
+            "uuid": "c1cb2778-60b7-4189-a347-1c314069daf3",
             "id": "scene",
             "versioned_id": "scene",
             "settings": {
-                "id_counter": 4,
+                "id_counter": 2,
                 "custom_size": false,
                 "items": [
                     {
-                        "name": "Color Source",
-                        "source_uuid": "9a881567-c4fe-40b5-8e31-77683d39272a",
-                        "visible": false,
+                        "name": "Media Source",
+                        "source_uuid": "1fdb8a18-69f3-4f81-a904-82d5538b397c",
+                        "visible": true,
+                        "locked": false,
+                        "rot": 0.0,
+                        "scale_ref": {
+                            "x": 1600.0,
+                            "y": 968.0
+                        },
+                        "align": 5,
+                        "bounds_type": 0,
+                        "bounds_align": 0,
+                        "bounds_crop": false,
+                        "crop_left": 0,
+                        "crop_top": 0,
+                        "crop_right": 0,
+                        "crop_bottom": 0,
+                        "id": 1,
+                        "group_item_backup": false,
+                        "pos": {
+                            "x": 159.0,
+                            "y": 103.0
+                        },
+                        "pos_rel": {
+                            "x": -1.3243801593780518,
+                            "y": -0.78719007968902588
+                        },
+                        "scale": {
+                            "x": 0.62760418653488159,
+                            "y": 0.62777775526046753
+                        },
+                        "scale_rel": {
+                            "x": 0.62760418653488159,
+                            "y": 0.62777775526046753
+                        },
+                        "bounds": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "bounds_rel": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "scale_filter": "disable",
+                        "blend_method": "default",
+                        "blend_type": "normal",
+                        "show_transition": {
+                            "duration": 0
+                        },
+                        "hide_transition": {
+                            "duration": 0
+                        },
+                        "private_settings": {}
+                    },
+                    {
+                        "name": "Browser",
+                        "source_uuid": "44f2b036-3d76-44b8-a213-abc2910e2c88",
+                        "visible": true,
                         "locked": false,
                         "rot": 0.0,
                         "scale_ref": {
@@ -88,6 +143,8 @@
             "push-to-talk-delay": 0,
             "hotkeys": {
                 "OBSBasic.SelectScene": [],
+                "libobs.show_scene_item.1": [],
+                "libobs.hide_scene_item.1": [],
                 "libobs.show_scene_item.2": [],
                 "libobs.hide_scene_item.2": []
             },
@@ -99,14 +156,16 @@
         },
         {
             "prev_ver": 520159232,
-            "name": "Color Source",
-            "uuid": "9a881567-c4fe-40b5-8e31-77683d39272a",
-            "id": "color_source",
-            "versioned_id": "color_source_v3",
+            "name": "Media Source",
+            "uuid": "1fdb8a18-69f3-4f81-a904-82d5538b397c",
+            "id": "ffmpeg_source",
+            "versioned_id": "ffmpeg_source",
             "settings": {
-                "color": 4278255615
+                "input_format": "mpegts",
+                "input": "srt://0.0.0.0:9999?mode=listener&timeout=5000000",
+                "is_local_file": false
             },
-            "mixers": 0,
+            "mixers": 255,
             "sync": 0,
             "flags": 0,
             "volume": 1.0,
@@ -117,7 +176,46 @@
             "push-to-mute-delay": 0,
             "push-to-talk": false,
             "push-to-talk-delay": 0,
-            "hotkeys": {},
+            "hotkeys": {
+                "libobs.mute": [],
+                "libobs.unmute": [],
+                "libobs.push-to-mute": [],
+                "libobs.push-to-talk": [],
+                "MediaSource.Restart": [],
+                "MediaSource.Play": [],
+                "MediaSource.Pause": [],
+                "MediaSource.Stop": []
+            },
+            "deinterlace_mode": 0,
+            "deinterlace_field_order": 0,
+            "monitoring_type": 0,
+            "private_settings": {}
+        },
+        {
+            "prev_ver": 520159232,
+            "name": "Browser",
+            "uuid": "44f2b036-3d76-44b8-a213-abc2910e2c88",
+            "id": "browser_source",
+            "versioned_id": "browser_source",
+            "settings": {},
+            "mixers": 255,
+            "sync": 0,
+            "flags": 0,
+            "volume": 1.0,
+            "balance": 0.5,
+            "enabled": true,
+            "muted": false,
+            "push-to-mute": false,
+            "push-to-mute-delay": 0,
+            "push-to-talk": false,
+            "push-to-talk-delay": 0,
+            "hotkeys": {
+                "libobs.mute": [],
+                "libobs.unmute": [],
+                "libobs.push-to-mute": [],
+                "libobs.push-to-talk": [],
+                "ObsBrowser.Refresh": []
+            },
             "deinterlace_mode": 0,
             "deinterlace_field_order": 0,
             "monitoring_type": 0,
@@ -178,6 +276,10 @@
             "active": false,
             "switches": []
         }
+    },
+    "resolution": {
+        "x": 1600,
+        "y": 968
     },
     "version": 2
 }

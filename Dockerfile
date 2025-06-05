@@ -196,11 +196,15 @@ ARG RUNTIME_PACKAGES="${OBS_CORE_PACKAGES} \
 RUN  apt-get update && apt-get install -y ${RUNTIME_PACKAGES}
 #libs for cef 
 RUN  apt-get update && apt-get install -y libnss3
-
-COPY --from=builder /home/obs-studio/install /home/obs-studio/install
 # # COPY --from=builder  /usr/local/cmake-3.29.3-linux-x86_64 /usr/local/cmake-3.29.3-linux-x86_64
 COPY --from=builder  /home/cef_binary_5060_linux_x86_64 /home/cef_binary_5060_linux_x86_64
 # # COPY --from=builder /usr/bin/nanolayer /usr/bin/nanolayer
+COPY --from=builder /home/obs-studio/install /home/obs-studio/install
+
+# for python scripting with libs
+RUN apt-get update && apt-get install -y python3-debugpy
+# RUN --mount=type=bind,source=/scripts/requirements.txt,target=requirements.txt \
+#     pip install -r requirements.txt 
 
 # https://obsproject.com/kb/launch-parameters
 ENTRYPOINT [ "./install/bin/obs", "--studio-mode" ]

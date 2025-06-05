@@ -3,3 +3,8 @@ service-config/obs-studio/config/plugin_config/obs-browser/**
 service-config/obs-studio/config/plugin_config/rtmp-services/** 
 service-config/obs-studio/config/profiler_data/**
 **.bak
+#
+scripts/__pycache__/**
+# RTMP output
+service-config/rtmp/output/dash/** 
+service-config/rtmp/output/thumbs/** 
