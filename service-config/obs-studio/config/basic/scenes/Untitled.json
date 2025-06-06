@@ -94,11 +94,11 @@
                         "id": 2,
                         "group_item_backup": false,
                         "pos": {
-                            "x": 0.0,
+                            "x": 800.0,
                             "y": 368.0
                         },
                         "pos_rel": {
-                            "x": -1.6528925895690918,
+                            "x": 0.0,
                             "y": -0.23966944217681885
                         },
                         "scale": {
@@ -197,7 +197,9 @@
             "uuid": "44f2b036-3d76-44b8-a213-abc2910e2c88",
             "id": "browser_source",
             "versioned_id": "browser_source",
-            "settings": {},
+            "settings": {
+                "url": "https://virtumedia.at"
+            },
             "mixers": 255,
             "sync": 0,
             "flags": 0,
@@ -253,7 +255,7 @@
     "transition_duration": 300,
     "preview_locked": false,
     "scaling_enabled": false,
-    "scaling_level": -14,
+    "scaling_level": -26,
     "scaling_off_x": 0.0,
     "scaling_off_y": 0.0,
     "modules": {

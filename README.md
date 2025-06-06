@@ -36,9 +36,15 @@ print(f"Docker image/container size: {size_mb:.2f} MB or {size_gb:.2f} GB")
 - https://github.com/obsproject/obs-studio/wiki/Getting-Started-With-OBS-Scripting
     - https://github.com/upgradeQ/Streaming-Software-Scripting-Reference
 
-# SRT input from `ffmpeg`
+# SRT input from `ffmpeg` to `srt://obs:xxxx...`
+
+step into the container `docker compose exec ffmpeg bash`
 
 `ffmpeg -f lavfi -i testsrc=size=1920x1080:rate=30 -f lavfi -i sine=frequency=440:sample_rate=44100 -c:v libx264 -pix_fmt yuv420p -preset ultrafast -tune zerolatency -b:v 2500k -c:a aac -b:a 128k -f mpegts -f mpegts "srt://obs:9999?pkt_size=1316&mode=caller"`
+
+### TODO
+
+#### 🪲 Bug
 
 After a few 
 ```
@@ -64,3 +70,6 @@ Key changes I've made:
 
 - Changed `-use_timeline 0` to `-use_timeline 1` - Using the timeline feature in DASH can help the player better understand segment availability and timing.
 
+# Frontend
+
+open `http://localhost:8088` in your browser to view the streaming content

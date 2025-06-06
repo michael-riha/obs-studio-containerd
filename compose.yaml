@@ -32,6 +32,12 @@ services:
       - 5678:5678 # debugpy port for python script debugging
       - 4455:4455 # websocket port
       - 2000:2000 #SRT input port
+    healthcheck:
+      test: ["CMD-SHELL", "ps aux | grep -v grep | grep 'obs' > /dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     depends_on:
       novnc:
         condition: service_healthy
@@ -47,9 +53,9 @@ services:
       - "8080:8080"
     healthcheck:
         test: "wget -q --spider http://localhost:8080 || exit 1"
-        interval: 10s
-        timeout: 6s
-        retries: 3
+        interval: 6s
+        timeout: 1s
+        retries: 5
   ffmpeg:
     image: jrottenberg/ffmpeg:7.1.1-ubuntu2404-edge
     entrypoint: tail -f /dev/null
@@ -65,6 +71,9 @@ services:
        - ./service-config/rtmp/rtmp-server.sh:/opt/rtmp/rtmp-server.sh
     ports: 
       - 1935:1935
+    depends_on:
+      obs-builder:
+        condition: service_healthy
   frontend:
     image: nginx:1.28.0-perl
     volumes:
