@@ -19,8 +19,8 @@ ffmpeg \
     -seg_duration 4 \
     -streaming 1 \
     -utc_timing_url "https://time.akamai.com/?iso" \
-    -index_correction 1 \
-    -use_timeline 0 \
+    -index_correction 0 \
+    -use_timeline 1 \
     -media_seg_name 'chunk-stream-$RepresentationID$-$Number%05d$.m4s' \
     -init_seg_name 'init-stream1-$RepresentationID$.m4s' \
     -window_size 5  \

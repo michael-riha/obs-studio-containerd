@@ -53,3 +53,14 @@ https://obsproject.com/kb/srt-protocol-streaming-guide
 
 https://ffmpeg.org/ffmpeg-protocols.html#srt
  Maybe works better with https://johnvansickle.com/ffmpeg/
+
+# RTMP Server
+
+copied from https://github.com/michael-riha/simple-rtmp-server/blob/master/scripts/ffmpeg_cli.sh
+
+Key changes I've made:
+
+- Changed `-index_correction 1` to `-index_correction 0` - This will prevent FFmpeg from trying to correct segment indices, which seems to be causing issues for the Shaka player.
+
+- Changed `-use_timeline 0` to `-use_timeline 1` - Using the timeline feature in DASH can help the player better understand segment availability and timing.
+
