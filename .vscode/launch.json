@@ -5,6 +5,22 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome against localhost",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}/frontend/src"
+        },
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Attach to Docker",
+            "port": 9229,
+            "restart": true,
+            "remoteRoot": "/app/frontend",
+            "localRoot": "${workspaceFolder}/frontend"
+        },
+        {
             "name": "Python: Remote Attach",
             "type": "debugpy",
             "request": "attach",

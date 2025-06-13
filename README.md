@@ -35,12 +35,30 @@ print(f"Docker image/container size: {size_mb:.2f} MB or {size_gb:.2f} GB")
 - start scripting: 
 - https://github.com/obsproject/obs-studio/wiki/Getting-Started-With-OBS-Scripting
     - https://github.com/upgradeQ/Streaming-Software-Scripting-Reference
-
+- add audio to `obs`
+    - https://github.com/Envek/dockerized-browser-streamer
+    - https://github.com/wu191287278/noVNC-audio
+    - https://medium.com/@18bhavyasharma/enabling-sound-card-access-in-docker-containers-using-pulseaudio-d52ff1f5eee4
 # SRT input from `ffmpeg` to `srt://obs:xxxx...`
 
 step into the container `docker compose exec ffmpeg bash`
 
 `ffmpeg -f lavfi -i testsrc=size=1920x1080:rate=30 -f lavfi -i sine=frequency=440:sample_rate=44100 -c:v libx264 -pix_fmt yuv420p -preset ultrafast -tune zerolatency -b:v 2500k -c:a aac -b:a 128k -f mpegts -f mpegts "srt://obs:9999?pkt_size=1316&mode=caller"`
+
+## from your native `linux` device
+
+### Cam
+
+get your devices: `v4l2-ctl --list-devices` <br>
+(e.g., `sudo apt install v4l-utils` on Debian/Ubuntu, `sudo dnf install v4l-utils` on Fedora/CentOS).
+
+`ffmpeg -f v4l2 -i /dev/video0 -f alsa -i default -c:v libx264 -pix_fmt yuv420p -preset ultrafast -tune zerolatency -b:v 2500k -c:a aac -b:a 128k -f mpegts "srt://localhost:2000?pkt_size=1316&mode=caller"`
+
+`ffmpeg -f v4l2 -i /dev/video4 -f alsa -i default -c:v libx264 -pix_fmt yuv420p -preset ultrafast -tune zerolatency -b:v 2500k -c:a aac -b:a 128k -f mpegts "srt://localhost:2000?pkt_size=1316&mode=caller"`
+
+### Test Source
+
+`ffmpeg -f lavfi -i testsrc=size=1920x1080:rate=30 -f lavfi -i sine=frequency=440:sample_rate=44100 -c:v libx264 -pix_fmt yuv420p -preset ultrafast -tune zerolatency -b:v 2500k -c:a aac -b:a 128k -f mpegts -f mpegts "srt://localhost:2000?pkt_size=1316&mode=caller"`
 
 ### TODO
 

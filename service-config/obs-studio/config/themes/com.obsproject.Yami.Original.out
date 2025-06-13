@@ -369,13 +369,11 @@ QListWidget QLineEdit:focus {
 /* Settings QList */
 
 OBSBasicSettings QScrollBar:vertical {
-    width: 21px;
-    margin-left: 9px;
+    width: 12px;
 }
 
 OBSBasicSettings QScrollBar:horizontal {
-    height: 21px;
-    margin-top: 9px;
+    height: 12px;
 }
 
 /* Settings properties view */
@@ -390,6 +388,37 @@ OBSDock > QWidget {
     border-bottom-right-radius: 4px;
     border: 1px solid #3c404d;
     border-top: none;
+}
+
+OBSDock QToolBar {
+    padding: 1px;
+    margin: 0px;
+    border-top: 1px solid #3c404d;
+    spacing: 0;
+}
+
+OBSDock QToolBar::separator {
+    background: transparent;
+    width: 4px;
+    border: none;
+}
+
+OBSDock QToolBar QToolButton {
+    background: transparent;
+    border: 1px solid transparent;
+    margin: 1px;
+    margin-top: 2px;
+    padding: 4px;
+    max-width: 14px;
+    max-height: 14px;
+}
+
+OBSDock QToolBar QToolButton:hover {
+    border-color: #5b6273;
+}
+
+OBSDock QToolBar QToolButton:disabled {
+    background: #1d1f26;
 }
 
 #transitionsFrame {
@@ -439,7 +468,7 @@ QDockWidget::float-button:pressed {
     padding: 1px -1px -1px 1px;
 }
 
-QScrollArea {
+QAbstractScrollArea {
     border-radius: 4px;
 }
 
@@ -482,6 +511,7 @@ QScrollBar {
     background-color: #272a33;
     margin: 0px;
     border-radius: 4px;
+    border: 1px solid #272a33;
 }
 
 ::corner {
@@ -542,8 +572,8 @@ QScrollBar::handle:hover {
 }
 
 QScrollBar::handle:pressed {
-    background-color: #13141a;
-    border-color: #13141a;
+    background-color: #4e5566;
+    border-color: #4e5566;
 }
 
 QScrollBar::handle:vertical {
@@ -557,6 +587,32 @@ QScrollBar::handle:horizontal {
 QScrollBar::handle:disabled {
     background: transparent;
     border-color: transparent;
+}
+
+OBSDock QListWidget {
+    padding: 0;
+}
+
+OBSDock QListWidget::item {
+    margin: 0 1.600000px;
+}
+
+OBSDock QScrollBar {
+    border-radius: 0;
+}
+
+OBSDock QListWidget::corner {
+    background: transparent;
+    border-top: 1px solid #3c404d;
+    border-left: 1px solid #3c404d;
+}
+
+OBSDock QScrollBar:horizontal {
+    border-top: 1px solid #3c404d;
+}
+
+OBSDock QScrollBar:vertical {
+    border-left: 1px solid #3c404d;
 }
 
 /* Source Context Bar */
@@ -632,7 +688,7 @@ QTabBar::tab {
     background: #272a33;
     color: #ffffff;
     border: none;
-    padding: 8px 12px;
+    padding: 7px 11px;
     min-width: 50px;
     margin: 1px 0px;
     margin-right: 2px;
@@ -1140,7 +1196,6 @@ QSlider::handle:disabled {
 #stackedMixerArea {
     border: none;
     padding: 0px;
-    border-bottom: 1px solid #3c404b;
 }
 
 VolControl {
@@ -1175,10 +1230,6 @@ VolControl #volLabel {
 }
 
 /* Vertical Mixer */
-#stackedMixerArea QScrollBar:vertical {
-    border-left: 1px solid #3c404d;
-}
-
 #vMixerScrollArea VolControl {
     padding: 4px 0px 4px;
     border-right: 1px solid #3c404d;

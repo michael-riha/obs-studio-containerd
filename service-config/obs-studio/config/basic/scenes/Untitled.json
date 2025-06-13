@@ -1,4 +1,35 @@
 {
+    "DesktopAudioDevice1": {
+        "prev_ver": 520159232,
+        "name": "Desktop Audio",
+        "uuid": "20958325-fb42-4cfa-9be3-c91cf8e98503",
+        "id": "pulse_output_capture",
+        "versioned_id": "pulse_output_capture",
+        "settings": {
+            "device_id": "default"
+        },
+        "mixers": 255,
+        "sync": 0,
+        "flags": 0,
+        "volume": 0.0016027487581595778,
+        "balance": 0.5,
+        "enabled": true,
+        "muted": false,
+        "push-to-mute": false,
+        "push-to-mute-delay": 0,
+        "push-to-talk": false,
+        "push-to-talk-delay": 0,
+        "hotkeys": {
+            "libobs.mute": [],
+            "libobs.unmute": [],
+            "libobs.push-to-mute": [],
+            "libobs.push-to-talk": []
+        },
+        "deinterlace_mode": 0,
+        "deinterlace_field_order": 0,
+        "monitoring_type": 0,
+        "private_settings": {}
+    },
     "current_scene": "Scene",
     "current_program_scene": "Scene",
     "scene_order": [
@@ -15,11 +46,11 @@
             "id": "scene",
             "versioned_id": "scene",
             "settings": {
-                "id_counter": 2,
+                "id_counter": 6,
                 "custom_size": false,
                 "items": [
                     {
-                        "name": "Media Source",
+                        "name": "internal SRT 9999",
                         "source_uuid": "1fdb8a18-69f3-4f81-a904-82d5538b397c",
                         "visible": true,
                         "locked": false,
@@ -36,7 +67,7 @@
                         "crop_top": 0,
                         "crop_right": 0,
                         "crop_bottom": 0,
-                        "id": 1,
+                        "id": 3,
                         "group_item_backup": false,
                         "pos": {
                             "x": 159.0,
@@ -53,6 +84,61 @@
                         "scale_rel": {
                             "x": 0.62760418653488159,
                             "y": 0.62777775526046753
+                        },
+                        "bounds": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "bounds_rel": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "scale_filter": "disable",
+                        "blend_method": "default",
+                        "blend_type": "normal",
+                        "show_transition": {
+                            "duration": 0
+                        },
+                        "hide_transition": {
+                            "duration": 0
+                        },
+                        "private_settings": {}
+                    },
+                    {
+                        "name": "external SRT 2000",
+                        "source_uuid": "9fca3644-146c-4cab-9fdb-291763d9c3aa",
+                        "visible": true,
+                        "locked": false,
+                        "rot": 135.0,
+                        "scale_ref": {
+                            "x": 1600.0,
+                            "y": 968.0
+                        },
+                        "align": 5,
+                        "bounds_type": 0,
+                        "bounds_align": 0,
+                        "bounds_crop": false,
+                        "crop_left": 0,
+                        "crop_top": 0,
+                        "crop_right": 0,
+                        "crop_bottom": 0,
+                        "id": 4,
+                        "group_item_backup": false,
+                        "pos": {
+                            "x": -374.0,
+                            "y": -209.5
+                        },
+                        "pos_rel": {
+                            "x": -2.4256198406219482,
+                            "y": -1.4328511953353882
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0
+                        },
+                        "scale_rel": {
+                            "x": 1.0,
+                            "y": 1.0
                         },
                         "bounds": {
                             "x": 0.0,
@@ -94,12 +180,12 @@
                         "id": 2,
                         "group_item_backup": false,
                         "pos": {
-                            "x": 800.0,
-                            "y": 368.0
+                            "x": 617.0,
+                            "y": 229.0
                         },
                         "pos_rel": {
-                            "x": 0.0,
-                            "y": -0.23966944217681885
+                            "x": -0.37809917330741882,
+                            "y": -0.52685952186584473
                         },
                         "scale": {
                             "x": 1.0,
@@ -108,6 +194,116 @@
                         "scale_rel": {
                             "x": 1.0,
                             "y": 1.0
+                        },
+                        "bounds": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "bounds_rel": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "scale_filter": "disable",
+                        "blend_method": "default",
+                        "blend_type": "normal",
+                        "show_transition": {
+                            "duration": 0
+                        },
+                        "hide_transition": {
+                            "duration": 0
+                        },
+                        "private_settings": {}
+                    },
+                    {
+                        "name": "Audio Output Capture (PulseAudio)",
+                        "source_uuid": "9eee922d-0f2c-4914-9d5e-341620761ca1",
+                        "visible": true,
+                        "locked": false,
+                        "rot": 0.0,
+                        "scale_ref": {
+                            "x": 1600.0,
+                            "y": 968.0
+                        },
+                        "align": 5,
+                        "bounds_type": 0,
+                        "bounds_align": 0,
+                        "bounds_crop": false,
+                        "crop_left": 0,
+                        "crop_top": 0,
+                        "crop_right": 0,
+                        "crop_bottom": 0,
+                        "id": 5,
+                        "group_item_backup": false,
+                        "pos": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "pos_rel": {
+                            "x": -1.6528925895690918,
+                            "y": -1.0
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0
+                        },
+                        "scale_rel": {
+                            "x": 1.0,
+                            "y": 1.0
+                        },
+                        "bounds": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "bounds_rel": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "scale_filter": "disable",
+                        "blend_method": "default",
+                        "blend_type": "normal",
+                        "show_transition": {
+                            "duration": 0
+                        },
+                        "hide_transition": {
+                            "duration": 0
+                        },
+                        "private_settings": {}
+                    },
+                    {
+                        "name": "Browser 2",
+                        "source_uuid": "5c80e201-6ebc-4831-b41a-c21cdb993511",
+                        "visible": true,
+                        "locked": false,
+                        "rot": 0.0,
+                        "scale_ref": {
+                            "x": 1600.0,
+                            "y": 968.0
+                        },
+                        "align": 5,
+                        "bounds_type": 0,
+                        "bounds_align": 0,
+                        "bounds_crop": false,
+                        "crop_left": 0,
+                        "crop_top": 0,
+                        "crop_right": 0,
+                        "crop_bottom": 0,
+                        "id": 6,
+                        "group_item_backup": false,
+                        "pos": {
+                            "x": 159.0,
+                            "y": -56.0
+                        },
+                        "pos_rel": {
+                            "x": -1.3243801593780518,
+                            "y": -1.1157025098800659
+                        },
+                        "scale": {
+                            "x": 2.309999942779541,
+                            "y": 2.309999942779541
+                        },
+                        "scale_rel": {
+                            "x": 2.309999942779541,
+                            "y": 2.309999942779541
                         },
                         "bounds": {
                             "x": 0.0,
@@ -143,10 +339,16 @@
             "push-to-talk-delay": 0,
             "hotkeys": {
                 "OBSBasic.SelectScene": [],
-                "libobs.show_scene_item.1": [],
-                "libobs.hide_scene_item.1": [],
+                "libobs.show_scene_item.3": [],
+                "libobs.hide_scene_item.3": [],
+                "libobs.show_scene_item.4": [],
+                "libobs.hide_scene_item.4": [],
                 "libobs.show_scene_item.2": [],
-                "libobs.hide_scene_item.2": []
+                "libobs.hide_scene_item.2": [],
+                "libobs.show_scene_item.5": [],
+                "libobs.hide_scene_item.5": [],
+                "libobs.show_scene_item.6": [],
+                "libobs.hide_scene_item.6": []
             },
             "deinterlace_mode": 0,
             "deinterlace_field_order": 0,
@@ -156,7 +358,7 @@
         },
         {
             "prev_ver": 520159232,
-            "name": "Media Source",
+            "name": "internal SRT 9999",
             "uuid": "1fdb8a18-69f3-4f81-a904-82d5538b397c",
             "id": "ffmpeg_source",
             "versioned_id": "ffmpeg_source",
@@ -222,6 +424,105 @@
             "deinterlace_field_order": 0,
             "monitoring_type": 0,
             "private_settings": {}
+        },
+        {
+            "prev_ver": 520159232,
+            "name": "external SRT 2000",
+            "uuid": "9fca3644-146c-4cab-9fdb-291763d9c3aa",
+            "id": "ffmpeg_source",
+            "versioned_id": "ffmpeg_source",
+            "settings": {
+                "input_format": "mpegts",
+                "input": "srt://0.0.0.0:2000?mode=listener&timeout=5000000",
+                "is_local_file": false
+            },
+            "mixers": 255,
+            "sync": 0,
+            "flags": 0,
+            "volume": 1.0,
+            "balance": 0.5,
+            "enabled": true,
+            "muted": false,
+            "push-to-mute": false,
+            "push-to-mute-delay": 0,
+            "push-to-talk": false,
+            "push-to-talk-delay": 0,
+            "hotkeys": {
+                "libobs.mute": [],
+                "libobs.unmute": [],
+                "libobs.push-to-mute": [],
+                "libobs.push-to-talk": [],
+                "MediaSource.Restart": [],
+                "MediaSource.Play": [],
+                "MediaSource.Pause": [],
+                "MediaSource.Stop": []
+            },
+            "deinterlace_mode": 0,
+            "deinterlace_field_order": 0,
+            "monitoring_type": 0,
+            "private_settings": {}
+        },
+        {
+            "prev_ver": 520159232,
+            "name": "Audio Output Capture (PulseAudio)",
+            "uuid": "9eee922d-0f2c-4914-9d5e-341620761ca1",
+            "id": "pulse_output_capture",
+            "versioned_id": "pulse_output_capture",
+            "settings": {},
+            "mixers": 255,
+            "sync": 0,
+            "flags": 0,
+            "volume": 0.34457316994667053,
+            "balance": 0.5,
+            "enabled": true,
+            "muted": false,
+            "push-to-mute": false,
+            "push-to-mute-delay": 0,
+            "push-to-talk": false,
+            "push-to-talk-delay": 0,
+            "hotkeys": {
+                "libobs.mute": [],
+                "libobs.unmute": [],
+                "libobs.push-to-mute": [],
+                "libobs.push-to-talk": []
+            },
+            "deinterlace_mode": 0,
+            "deinterlace_field_order": 0,
+            "monitoring_type": 0,
+            "private_settings": {}
+        },
+        {
+            "prev_ver": 520159232,
+            "name": "Browser 2",
+            "uuid": "5c80e201-6ebc-4831-b41a-c21cdb993511",
+            "id": "browser_source",
+            "versioned_id": "browser_source",
+            "settings": {
+                "url": "https://youtube.com",
+                "reroute_audio": true
+            },
+            "mixers": 255,
+            "sync": 0,
+            "flags": 0,
+            "volume": 0.36020854115486145,
+            "balance": 0.5,
+            "enabled": true,
+            "muted": false,
+            "push-to-mute": false,
+            "push-to-mute-delay": 0,
+            "push-to-talk": false,
+            "push-to-talk-delay": 0,
+            "hotkeys": {
+                "libobs.mute": [],
+                "libobs.unmute": [],
+                "libobs.push-to-mute": [],
+                "libobs.push-to-talk": [],
+                "ObsBrowser.Refresh": []
+            },
+            "deinterlace_mode": 0,
+            "deinterlace_field_order": 0,
+            "monitoring_type": 1,
+            "private_settings": {}
         }
     ],
     "groups": [],
@@ -238,7 +539,7 @@
             "duration": 300,
             "hotkeys": [],
             "id": 2,
-            "fade_to_black": false
+            "fade_to_black": true
         },
         {
             "name": "Fade",
@@ -255,7 +556,7 @@
     "transition_duration": 300,
     "preview_locked": false,
     "scaling_enabled": false,
-    "scaling_level": -26,
+    "scaling_level": -20,
     "scaling_off_x": 0.0,
     "scaling_off_y": 0.0,
     "modules": {

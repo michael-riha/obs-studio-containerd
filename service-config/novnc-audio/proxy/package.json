@@ -1,0 +1,29 @@
+{
+  "name": "audio-websocket-proxy",
+  "version": "1.0.0",
+  "description": "POC for streaming audio from FFmpeg to WebSocket clients",
+  "main": "proxy.js",
+  "scripts": {
+    "start": "node proxy.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon proxy.js"
+  },
+  "keywords": [
+    "audio",
+    "websocket",
+    "proxy",
+    "ffmpeg"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.13.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "devDependencies": {
+  "nodemon": "^3.0.2"
+  }
+}

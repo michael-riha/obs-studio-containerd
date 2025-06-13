@@ -1,0 +1,54 @@
+services:
+  # Node.js WebSocket Proxy
+  proxy:
+    build: 
+      context: ./proxy
+      dockerfile: Dockerfile
+      # target: builder
+    # entrypoint: tail -f /dev/null
+    entrypoint: node websocket-relay audiostream 8081 8082
+    ports:
+      # - "8888:8888"     # Web interface
+      - "8881-8882:8081-8082"     # STREAM_PORT WEBSOCKET_PORT
+      # - "1234:1234/udp" # Audio stream port
+    volumes:
+      - ./proxy/static:/app/static
+      - ./proxy/src:/app
+       # Order Matters: this creates an anonymous volume specifically for the node_modules directory inside the container.
+      - /app/node_modules
+    #TODO: needs improvement
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "8082"]  # Just check if the port is open and listening
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+  frontend:
+    build: 
+      context: ./proxy
+      dockerfile: Dockerfile
+      # target: builder
+    # entrypoint: tail -f /dev/null
+    entrypoint: node proxy
+    ports:
+      - "8888:8888"     # Web interface
+    volumes:
+      - ./proxy/static:/app/static
+      - ./proxy/src:/app
+       # Order Matters: this creates an anonymous volume specifically for the node_modules directory inside the container.
+      - /app/node_modules
+
+  # Audio Test Signal Generator
+  # audio-source:
+  #   image: jrottenberg/ffmpeg:4.4-alpine
+  #   # entrypoint: >
+  #   #   sh -c "
+  #   #   ffmpeg -re -f lavfi -i 'sine=frequency=520:duration=0' -f mpegts -codec:a mp2 udp://proxy:1234
+  #   #   "
+  #   entrypoint: >
+  #     sh -c "
+  #     ffmpeg -re -f lavfi -i 'sine=frequency=520:duration=0' -f mpegts -codec:a mp2 http://proxy:8081/audiostream
+  #     "
+  #   # entrypoint: tail -f /dev/null
+  #   depends_on:
+  #     - proxy

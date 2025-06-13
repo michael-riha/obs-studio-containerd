@@ -181,7 +181,7 @@ WORKDIR /home/obs-studio
 ENTRYPOINT [ "./install/bin/obs" ]
 
 
-FROM ${IMAGE_VERSION} AS production
+FROM ${IMAGE_VERSION} AS obs
 
 WORKDIR /home/obs-studio
 
@@ -208,3 +208,19 @@ RUN apt-get update && apt-get install -y python3-debugpy
 
 # https://obsproject.com/kb/launch-parameters
 ENTRYPOINT [ "./install/bin/obs", "--studio-mode" ]
+
+
+FROM obs AS audio
+
+# pulseaudio for sound
+RUN apt-get update && apt-get install -y \
+    pulseaudio \
+    ffmpeg \
+    --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY ./service-config/obs-studio/entrypoint.sh .
+
+FROM audio AS production
+
+ENTRYPOINT ["./entrypoint.sh"]

@@ -1,3 +1,5 @@
+include:
+  - ./service-config/novnc-audio/compose.yaml  #with serviceB declared
 services:
   # obs:
   #   image: obs-headless:latest
@@ -22,16 +24,18 @@ services:
       context: .
       dockerfile: Dockerfile
       # target: builder
-    # entrypoint: tail -f /dev/null
+    entrypoint: tail -f /dev/null
     volumes:
       - ./service-config/obs-studio/config:/root/.config/obs-studio
+      - ./service-config/obs-studio/entrypoint.sh:/home/obs-studio/entrypoint.sh
       - ./scripts:/opt/scripts
     environment:
       - DISPLAY=novnc:0.0
     ports:
       - 5678:5678 # debugpy port for python script debugging
       - 4455:4455 # websocket port
-      - 2000:2000 #SRT input port
+      - 2000:2000/tcp #SRT just as fallback
+      - 2000:2000/udp #SRT input port
     healthcheck:
       test: ["CMD-SHELL", "ps aux | grep -v grep | grep 'obs' > /dev/null || exit 1"]
       interval: 10s
@@ -40,6 +44,8 @@ services:
       start_period: 10s
     depends_on:
       novnc:
+        condition: service_healthy
+      proxy:
         condition: service_healthy
   novnc:  
     image: theasp/novnc:latest
@@ -74,13 +80,30 @@ services:
     depends_on:
       obs-builder:
         condition: service_healthy
-  frontend:
+  player:
     image: nginx:1.28.0-perl
     volumes:
       - ./frontend/index.html:/usr/share/nginx/html/index.html
       - ./service-config/rtmp/output:/usr/share/nginx/html/output
     ports:
       - 8088:80
+  # frontend:
+  #   image: obs-frontend:latest
+  #   entrypoint: tail -f /dev/null
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #     # target: builder
+  #   volumes:
+  #     - ./frontend:/app/frontend
+  #      # Order Matters: this creates an anonymous volume specifically for the node_modules directory inside the container.
+  #     - /app/frontend/node_modules
+  #   ports:
+  #     - "3000:3000"  # App
+  #     - "9229:9229"  # Debugging
+  #   environment:
+  #     - NODE_ENV=development
+  #     - CHOKIDAR_USEPOLLING=true
   dive:
     image: wagoodman/dive:latest
     volumes:
