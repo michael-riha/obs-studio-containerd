@@ -2,6 +2,7 @@ service-config/obs-studio/config/logs/**
 service-config/obs-studio/config/plugin_config/obs-browser/** 
 service-config/obs-studio/config/plugin_config/rtmp-services/** 
 service-config/obs-studio/config/profiler_data/**
+service-config/obs-studio/logs/**
 **.bak
 #
 scripts/__pycache__/**

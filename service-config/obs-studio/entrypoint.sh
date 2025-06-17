@@ -1,84 +1,128 @@
 #!/bin/bash
 
-# Setup shutdown logic
-trap 'trap " " SIGINT; kill -SIGINT 0; wait;' SIGINT SIGTERM
+# Define color codes
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
 
-# Clean up any stale files
-rm -f /run/dbus/pid
-rm -f /var/run/dbus/pid
-rm -f /var/run/pulse/pid
-rm -rf /tmp/pulse-*
+# Directory to store log files
+LOG_DIR="./logs"
+mkdir -p "$LOG_DIR"
 
-# Start D-Bus
-mkdir -p /var/run/dbus
-dbus-uuidgen > /var/lib/dbus/machine-id
-dbus-daemon --system --nopidfile &
-sleep 2
+# Get the directory where this script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-echo "Setting up PulseAudio..."
+# Array of scripts to run (with paths relative to this script's location)
+SCRIPTS=("${SCRIPT_DIR}/services/dbus-service.sh" 
+         "${SCRIPT_DIR}/services/pulse-audio.sh" 
+         "${SCRIPT_DIR}/services/obs-service.sh" 
+         "${SCRIPT_DIR}/services/ffmpeg-service.sh")
 
-# Create pulse user if needed
-if ! id -u pulse > /dev/null 2>&1; then
-    useradd -r -s /bin/false -d /var/run/pulse pulse
-fi
+# Function to stop all existing screen sessions and related processes
+cleanup_existing_sessions() {
+    echo -e "${BLUE}Cleaning up existing screen sessions...${NC}"
+    
+    # Find and kill all screen sessions
+    if screen -ls | grep -q .; then
+        screen -ls | grep -o '[0-9]\+\.[^[:space:]]\+' | while read session; do
+            echo -e "${YELLOW} ⏹️    Terminating screen session: $session${NC}"
+            screen -S "$session" -X quit
+        done
+    else
+        echo -e "${GREEN}No existing screen sessions found.${NC}"
+    fi
+    
+    # Kill any potentially lingering processes based on script names
+    for script in "${SCRIPTS[@]}"; do
+        if [ -f "$script" ]; then
+            script_name=$(basename "$script" .sh)
+            service_name=${script_name%-service}  # Remove "-service" suffix to get base service name
+            
+            if pgrep -f "$service_name" > /dev/null; then
+                echo -e "${YELLOW} 🛑   Stopping $service_name processes...${NC}"
+                pkill -f "$service_name"
+            fi
+        fi
+    done
+    
+    # Brief pause to allow processes to terminate
+    sleep 1
+    echo -e "${GREEN} 🧹 Cleanup complete.${NC}"
+    echo -e "-------------------------------------------------------------------"
+}
 
-# Create needed directories and set permissions
-mkdir -p /var/run/pulse
-chown -R pulse:pulse /var/run/pulse
+# Run cleanup before starting
+cleanup_existing_sessions
 
-# Create the system.pa file without including the modules that get loaded automatically
-mkdir -p /etc/pulse
-cat > /etc/pulse/system.pa << EOF
-#!/usr/bin/pulseaudio -nF
-# Only load modules that aren't loaded automatically
-load-module module-native-protocol-unix auth-anonymous=1
-load-module module-null-sink sink_name=v1 sink_properties=device.description="Virtual_Sink"
-load-module module-null-sink sink_name=obs_output sink_properties=device.description="OBS_Output"
-set-default-sink v1
-set-default-source v1.monitor
-EOF
+# Function to run a script in a screen session with logging
+run_in_screen() {
+    local script_path=$1
+    local script_name=$(basename "$script_path" .sh)  # Remove .sh extension for cleaner names
+    local log_file="$LOG_DIR/${script_name}.log"
+    
+    # Create a screen session for this script with better error handling
+    screen -dmS "$script_name" bash -c "
+        # Explicit grouping for clarity
+        {
+            # Set up output redirection first
+            exec > >(tee -a \"$log_file\") 2>&1
+            
+            echo \"[$(date)] Starting $script_name service...\"
+            
+            # Check if script exists and is executable
+            if [ ! -x \"$script_path\" ]; then
+                echo \"${RED}ERROR: Script $script_path is not executable! Setting permissions.${NC}\"
+                chmod +x \"$script_path\"
+            fi
+            
+            # Run the script, and if it fails, keep the screen session alive
+            \"$script_path\" || { 
+                echo \"${RED}ERROR: $script_name failed with exit code $?. Check the log for details.${NC}\";
+                echo \"${YELLOW}Keeping screen session alive for inspection.${NC}\";
+                exec bash;  # Keep the session alive with a shell
+            }
+        }
+    "
+}
 
-# Kill any existing PulseAudio instances
-pkill -9 pulseaudio || true
+# Main execution
+for script in "${SCRIPTS[@]}"; do
+    if [ -f "$script" ]; then
+        script_name=$(basename "$script" .sh)
+        echo -e "${CYAN}  🚀 Starting ${NC}${GREEN}$script_name service ${NC}${CYAN}in screen session...${NC}"
+        run_in_screen "$script"
+        
+        # Add sleep between service starts
+        # Give more time to critical services
+        case "$script_name" in
+            "dbus-service"|"pulse-audio")
+                echo -e "${BLUE}Waiting for $script_name to initialize...${NC}"
+                sleep 3  # Longer delay for critical system services
+                ;;
+            *)
+                sleep 1  # Standard delay for other services
+                ;;
+        esac
+    else
+        echo -e "${RED}Error: Script $script not found!${NC}" >&2
+    fi
+done
+
+# Give the sessions a moment to initialize
 sleep 1
 
-echo "Starting PulseAudio in system mode..."
-pulseaudio --system --disallow-exit --log-level=info --daemonize
+# List all running screen sessions
+echo -e "\n${GREEN}Active screen sessions:${NC}"
+screen -ls
 
-# Give PulseAudio time to initialize
-sleep 2
-
-# Set the environment variable for all future commands
-export PULSE_SERVER=/var/run/pulse/native
-
-# Verify PulseAudio connection
-echo "Testing PulseAudio connection..."
-if pactl info; then
-    echo "PulseAudio is working correctly!"
-    
-    # List available sinks for verification
-    echo -e "\nAvailable audio sinks:"
-    pactl list short sinks
-    
-    # List available sources for verification
-    echo -e "\nAvailable audio sources:"
-    pactl list short sources
-else
-    echo "PulseAudio connection failed."
-    exit 1
-fi
-
-echo "PulseAudio configuration complete!"
-
-# Export this for any child processes
-echo "export PULSE_SERVER=/var/run/pulse/native" >> /etc/environment
-echo "export PULSE_SERVER=/var/run/pulse/native" >> /etc/profile.d/pulse.sh
-
-# Now you can start OBS with the correct environment variable
-PULSE_SERVER=/var/run/pulse/native ./install/bin/obs --studio-mode &
-ffmpeg -y -nostdin -f alsa -i pulse -f mpegts -codec:a mp2 http://proxy:8081/audiostream
-
-# proxy test which works!
-# ffmpeg -re -f lavfi -i 'sine=frequency=520:duration=0' -f mpegts -codec:a mp2 http://proxy:8081/audiostream
-# Keep the container running
-wait
+# Usage instructions
+echo -e "\n------------ USAGE INSTRUCTIONS ------------------"
+echo -e "${CYAN}To attach to a session:${NC}"
+echo "  screen -r <session_name>   # example: screen -r obs"
+echo -e "${CYAN}To detach from a session:${NC}"
+echo "  Press Ctrl+A then D"
+echo -e "\n${CYAN}To check logs:${NC}"
+echo "  cat logs/<service_name>.log"

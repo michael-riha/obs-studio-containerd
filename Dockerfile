@@ -216,6 +216,7 @@ FROM obs AS audio
 RUN apt-get update && apt-get install -y \
     pulseaudio \
     ffmpeg \
+    screen \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 

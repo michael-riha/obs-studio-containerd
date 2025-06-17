@@ -25,9 +25,13 @@ services:
       dockerfile: Dockerfile
       # target: builder
     entrypoint: tail -f /dev/null
+    # entrypoint: ./entrypoint.sh
     volumes:
       - ./service-config/obs-studio/config:/root/.config/obs-studio
       - ./service-config/obs-studio/entrypoint.sh:/home/obs-studio/entrypoint.sh
+      - ./service-config/obs-studio/scripts:/home/obs-studio/scripts
+      - ./service-config/obs-studio/services:/home/obs-studio/services
+      - ./service-config/obs-studio/logs:/home/obs-studio/logs
       - ./scripts:/opt/scripts
     environment:
       - DISPLAY=novnc:0.0

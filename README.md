@@ -39,6 +39,13 @@ print(f"Docker image/container size: {size_mb:.2f} MB or {size_gb:.2f} GB")
     - https://github.com/Envek/dockerized-browser-streamer
     - https://github.com/wu191287278/noVNC-audio
     - https://medium.com/@18bhavyasharma/enabling-sound-card-access-in-docker-containers-using-pulseaudio-d52ff1f5eee4
+
+# Roadmap
+
+- add `arm`-support
+- add obs logging analyzer
+    - https://github.com/obsproject/loganalyzer
+
 # SRT input from `ffmpeg` to `srt://obs:xxxx...`
 
 step into the container `docker compose exec ffmpeg bash`

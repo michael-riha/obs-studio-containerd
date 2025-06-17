@@ -29,7 +29,7 @@ services:
       dockerfile: Dockerfile
       # target: builder
     # entrypoint: tail -f /dev/null
-    entrypoint: node proxy
+    entrypoint: npx nodemon proxy.js
     ports:
       - "8888:8888"     # Web interface
     volumes:

@@ -109,7 +109,7 @@
                         "source_uuid": "9fca3644-146c-4cab-9fdb-291763d9c3aa",
                         "visible": true,
                         "locked": false,
-                        "rot": 135.0,
+                        "rot": 0.0,
                         "scale_ref": {
                             "x": 1600.0,
                             "y": 968.0
@@ -125,12 +125,12 @@
                         "id": 4,
                         "group_item_backup": false,
                         "pos": {
-                            "x": -374.0,
-                            "y": -209.5
+                            "x": 276.0,
+                            "y": -135.0
                         },
                         "pos_rel": {
-                            "x": -2.4256198406219482,
-                            "y": -1.4328511953353882
+                            "x": -1.0826445817947388,
+                            "y": -1.2789256572723389
                         },
                         "scale": {
                             "x": 1.0,
@@ -290,20 +290,20 @@
                         "id": 6,
                         "group_item_backup": false,
                         "pos": {
-                            "x": 159.0,
-                            "y": -56.0
+                            "x": 99.0,
+                            "y": 241.0
                         },
                         "pos_rel": {
-                            "x": -1.3243801593780518,
-                            "y": -1.1157025098800659
+                            "x": -1.4483470916748047,
+                            "y": -0.50206613540649414
                         },
                         "scale": {
-                            "x": 2.309999942779541,
-                            "y": 2.309999942779541
+                            "x": 1.5,
+                            "y": 1.5
                         },
                         "scale_rel": {
-                            "x": 2.309999942779541,
-                            "y": 2.309999942779541
+                            "x": 1.5,
+                            "y": 1.5
                         },
                         "bounds": {
                             "x": 0.0,
@@ -439,7 +439,7 @@
             "mixers": 255,
             "sync": 0,
             "flags": 0,
-            "volume": 1.0,
+            "volume": 0.88521313667297363,
             "balance": 0.5,
             "enabled": true,
             "muted": false,
@@ -459,8 +459,38 @@
             },
             "deinterlace_mode": 0,
             "deinterlace_field_order": 0,
-            "monitoring_type": 0,
-            "private_settings": {}
+            "monitoring_type": 2,
+            "private_settings": {},
+            "filters": [
+                {
+                    "prev_ver": 520159232,
+                    "name": "3-Band Equalizer",
+                    "uuid": "dad2ef4a-a556-4b76-8e99-f85d5b3e1636",
+                    "id": "basic_eq_filter",
+                    "versioned_id": "basic_eq_filter",
+                    "settings": {
+                        "low": 11.5,
+                        "mid": -5.0,
+                        "high": -6.2999999999999998
+                    },
+                    "mixers": 255,
+                    "sync": 0,
+                    "flags": 0,
+                    "volume": 1.0,
+                    "balance": 0.5,
+                    "enabled": true,
+                    "muted": false,
+                    "push-to-mute": false,
+                    "push-to-mute-delay": 0,
+                    "push-to-talk": false,
+                    "push-to-talk-delay": 0,
+                    "hotkeys": {},
+                    "deinterlace_mode": 0,
+                    "deinterlace_field_order": 0,
+                    "monitoring_type": 0,
+                    "private_settings": {}
+                }
+            ]
         },
         {
             "prev_ver": 520159232,
@@ -499,12 +529,13 @@
             "versioned_id": "browser_source",
             "settings": {
                 "url": "https://youtube.com",
+                "css": "",
                 "reroute_audio": true
             },
             "mixers": 255,
             "sync": 0,
             "flags": 0,
-            "volume": 0.36020854115486145,
+            "volume": 0.30582880973815918,
             "balance": 0.5,
             "enabled": true,
             "muted": false,
@@ -555,8 +586,8 @@
     "current_transition": "Fade",
     "transition_duration": 300,
     "preview_locked": false,
-    "scaling_enabled": false,
-    "scaling_level": -20,
+    "scaling_enabled": true,
+    "scaling_level": -32,
     "scaling_off_x": 0.0,
     "scaling_off_y": 0.0,
     "modules": {
