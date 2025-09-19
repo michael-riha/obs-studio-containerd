@@ -3,9 +3,12 @@ service-config/obs-studio/config/plugin_config/obs-browser/**
 service-config/obs-studio/config/plugin_config/rtmp-services/** 
 service-config/obs-studio/config/profiler_data/**
 service-config/obs-studio/logs/**
+service-config/obs-studio/config/basic/**
+service-config/obs-studio/config/themes/**
+service-config/obs-studio/config/plugin_config/obs-websocket/config.json
 **.bak
 #
-scripts/__pycache__/**
+__pycache__/**
 # RTMP output
 service-config/rtmp/output/dash/** 
 service-config/rtmp/output/thumbs/** 

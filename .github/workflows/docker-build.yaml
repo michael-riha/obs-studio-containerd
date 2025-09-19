@@ -1,0 +1,34 @@
+name: Deploy to Dockerhub
+on:
+  push:
+    branches:
+      # - master
+      - feat/e2e
+
+env:
+  IMAGE_NAME: obs-studio-containerd
+  DOCKERHUB_USER: miriha
+
+jobs:
+  build:
+    name: Build Image
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+    - name: Debug env
+      run: |
+        echo $AWS_DEFAULT_REGION/$DOCKER_REGISTRY/$CONTAINER_NAME/$GITHUB_RUN_ID
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ env.$DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Build, tag, and push image to Docker Hub
+      # push all tags https://stackoverflow.com/a/56905333
+      run: |
+        echo $DOCKER_USER/$CONTAINER_NAME:$GITHUB_RUN_ID
+        docker --version
+        docker build -t $DOCKERHUB_USER/$IMAGE_NAME:$GITHUB_RUN_ID -t $DOCKERHUB_USER/$IMAGE_NAME:latest . 
+        docker push $DOCKER_USER/$IMAGE_NAME  --all-tags
+
