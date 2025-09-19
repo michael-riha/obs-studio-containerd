@@ -63,9 +63,39 @@ get your devices: `v4l2-ctl --list-devices` <br>
 
 `ffmpeg -f v4l2 -i /dev/video4 -f alsa -i default -c:v libx264 -pix_fmt yuv420p -preset ultrafast -tune zerolatency -b:v 2500k -c:a aac -b:a 128k -f mpegts "srt://localhost:2000?pkt_size=1316&mode=caller"`
 
+As the above but more stable without errors:
+
+`ffmpeg -f v4l2 -thread_queue_size 512 -i /dev/video4        -f alsa -thread_queue_size 1024 -i default        -c:v libx264 -pix_fmt yuv420p -preset ultrafast -tune zerolatency        -x264-params "nal-hrd=cbr:force-cfr=1" -b:v 2500k -maxrate 2500k -minrate 2500k -bufsize 2500k        -c:a aac -b:a 128k -ar 44100 -ac 2        -flush_packets 0 -muxdelay 0.1 -muxpreload 0.1        -f mpegts "srt://localhost:2000?pkt_size=1316&mode=caller&latency=200000&rcvbuf=10000000&sndbuf=10000000"`
+
+Another approach to now make it with less delay and more aggressive low-latency
+
+```bash
+ffmpeg -f v4l2 -thread_queue_size 16 -framerate 30 -input_format yuyv422 -video_size 1280x720 -i /dev/video4 \
+       -f alsa -thread_queue_size 512 -i default \
+       -c:v libx264 -preset ultrafast -tune zerolatency -profile:v high422 \
+       -x264-params "keyint=30:min-keyint=30:no-scenecut=1:rc-lookahead=0:sync-lookahead=0:nal-hrd=cbr" \
+       -b:v 2500k -maxrate 2500k -minrate 2500k -bufsize 2500k \
+       -g 30 -pix_fmt yuv420p \
+       -c:a aac -b:a 128k -ar 48000 -ac 2 -af "aresample=async=1:first_pts=0" \
+       -fflags nobuffer -flags low_delay \
+       -muxdelay 0 -muxpreload 0 \
+       -f mpegts "srt://localhost:2000?pkt_size=1316&mode=caller&latency=125000&tsbpd=yes&transtype=live"
+```
+
 ### Test Source
 
 `ffmpeg -f lavfi -i testsrc=size=1920x1080:rate=30 -f lavfi -i sine=frequency=440:sample_rate=44100 -c:v libx264 -pix_fmt yuv420p -preset ultrafast -tune zerolatency -b:v 2500k -c:a aac -b:a 128k -f mpegts -f mpegts "srt://localhost:2000?pkt_size=1316&mode=caller"`
+
+### Test inside the `obs-headless` to send to `rtmp`
+
+✋ obs has no display: NOT WORKING
+
+
+
+goto: `docker compose exec novnc bash`
+
+- `apt-get update && apt-get install ffmpeg`
+    - `ffmpeg -f x11grab -s 1280x720 -i :0.0+100,100 -c:v libx264 -preset ultrafast -tune zerolatency -crf 25 -f flv rtmp://rtmp:1935`
 
 ### TODO
 

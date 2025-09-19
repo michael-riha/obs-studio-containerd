@@ -105,61 +105,6 @@
                         "private_settings": {}
                     },
                     {
-                        "name": "external SRT 2000",
-                        "source_uuid": "9fca3644-146c-4cab-9fdb-291763d9c3aa",
-                        "visible": true,
-                        "locked": false,
-                        "rot": 0.0,
-                        "scale_ref": {
-                            "x": 1600.0,
-                            "y": 968.0
-                        },
-                        "align": 5,
-                        "bounds_type": 0,
-                        "bounds_align": 0,
-                        "bounds_crop": false,
-                        "crop_left": 0,
-                        "crop_top": 0,
-                        "crop_right": 0,
-                        "crop_bottom": 0,
-                        "id": 4,
-                        "group_item_backup": false,
-                        "pos": {
-                            "x": 276.0,
-                            "y": -135.0
-                        },
-                        "pos_rel": {
-                            "x": -1.0826445817947388,
-                            "y": -1.2789256572723389
-                        },
-                        "scale": {
-                            "x": 1.0,
-                            "y": 1.0
-                        },
-                        "scale_rel": {
-                            "x": 1.0,
-                            "y": 1.0
-                        },
-                        "bounds": {
-                            "x": 0.0,
-                            "y": 0.0
-                        },
-                        "bounds_rel": {
-                            "x": 0.0,
-                            "y": 0.0
-                        },
-                        "scale_filter": "disable",
-                        "blend_method": "default",
-                        "blend_type": "normal",
-                        "show_transition": {
-                            "duration": 0
-                        },
-                        "hide_transition": {
-                            "duration": 0
-                        },
-                        "private_settings": {}
-                    },
-                    {
                         "name": "Browser",
                         "source_uuid": "44f2b036-3d76-44b8-a213-abc2910e2c88",
                         "visible": true,
@@ -290,20 +235,75 @@
                         "id": 6,
                         "group_item_backup": false,
                         "pos": {
-                            "x": 99.0,
-                            "y": 241.0
+                            "x": -408.0,
+                            "y": 0.0
                         },
                         "pos_rel": {
-                            "x": -1.4483470916748047,
-                            "y": -0.50206613540649414
+                            "x": -2.4958677291870117,
+                            "y": -1.0
                         },
                         "scale": {
-                            "x": 1.5,
-                            "y": 1.5
+                            "x": 2.0662500858306885,
+                            "y": 2.0666666030883789
                         },
                         "scale_rel": {
-                            "x": 1.5,
-                            "y": 1.5
+                            "x": 2.0662500858306885,
+                            "y": 2.0666666030883789
+                        },
+                        "bounds": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "bounds_rel": {
+                            "x": 0.0,
+                            "y": 0.0
+                        },
+                        "scale_filter": "disable",
+                        "blend_method": "default",
+                        "blend_type": "normal",
+                        "show_transition": {
+                            "duration": 0
+                        },
+                        "hide_transition": {
+                            "duration": 0
+                        },
+                        "private_settings": {}
+                    },
+                    {
+                        "name": "external SRT 2000",
+                        "source_uuid": "9fca3644-146c-4cab-9fdb-291763d9c3aa",
+                        "visible": true,
+                        "locked": false,
+                        "rot": 0.0,
+                        "scale_ref": {
+                            "x": 1600.0,
+                            "y": 968.0
+                        },
+                        "align": 5,
+                        "bounds_type": 0,
+                        "bounds_align": 0,
+                        "bounds_crop": false,
+                        "crop_left": 0,
+                        "crop_top": 0,
+                        "crop_right": 0,
+                        "crop_bottom": 0,
+                        "id": 4,
+                        "group_item_backup": false,
+                        "pos": {
+                            "x": 159.0,
+                            "y": 0.0
+                        },
+                        "pos_rel": {
+                            "x": -1.3243801593780518,
+                            "y": -1.0
+                        },
+                        "scale": {
+                            "x": 1.0,
+                            "y": 1.0
+                        },
+                        "scale_rel": {
+                            "x": 1.0,
+                            "y": 1.0
                         },
                         "bounds": {
                             "x": 0.0,
@@ -341,14 +341,14 @@
                 "OBSBasic.SelectScene": [],
                 "libobs.show_scene_item.3": [],
                 "libobs.hide_scene_item.3": [],
-                "libobs.show_scene_item.4": [],
-                "libobs.hide_scene_item.4": [],
                 "libobs.show_scene_item.2": [],
                 "libobs.hide_scene_item.2": [],
                 "libobs.show_scene_item.5": [],
                 "libobs.hide_scene_item.5": [],
                 "libobs.show_scene_item.6": [],
-                "libobs.hide_scene_item.6": []
+                "libobs.hide_scene_item.6": [],
+                "libobs.show_scene_item.4": [],
+                "libobs.hide_scene_item.4": []
             },
             "deinterlace_mode": 0,
             "deinterlace_field_order": 0,
@@ -400,7 +400,7 @@
             "id": "browser_source",
             "versioned_id": "browser_source",
             "settings": {
-                "url": "https://virtumedia.at"
+                "url": "https://static.vecteezy.com/system/resources/thumbnails/020/933/072/small_2x/abstract-blur-gradient-background-vector.jpg"
             },
             "mixers": 255,
             "sync": 0,
@@ -439,7 +439,7 @@
             "mixers": 255,
             "sync": 0,
             "flags": 0,
-            "volume": 0.88521313667297363,
+            "volume": 0.018693627789616585,
             "balance": 0.5,
             "enabled": true,
             "muted": false,
@@ -502,7 +502,7 @@
             "mixers": 255,
             "sync": 0,
             "flags": 0,
-            "volume": 0.34457316994667053,
+            "volume": 0.25599122047424316,
             "balance": 0.5,
             "enabled": true,
             "muted": false,
@@ -535,7 +535,7 @@
             "mixers": 255,
             "sync": 0,
             "flags": 0,
-            "volume": 0.30582880973815918,
+            "volume": 0.12118056416511536,
             "balance": 0.5,
             "enabled": true,
             "muted": false,
@@ -577,7 +577,7 @@
             "duration": 300,
             "hotkeys": [],
             "id": 3,
-            "fade_to_black": true
+            "fade_to_black": false
         }
     ],
     "transitions": [],

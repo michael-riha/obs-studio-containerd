@@ -1,5 +1,5 @@
 include:
-  - ./service-config/novnc-audio/compose.yaml  #with serviceB declared
+  - ./service-config/novnc-audio/compose.yaml
 services:
   # obs:
   #   image: obs-headless:latest
@@ -23,23 +23,33 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      # target: dependencies
       # target: builder
-    entrypoint: tail -f /dev/null
-    # entrypoint: ./entrypoint.sh
+    # entrypoint: tail -f /dev/null
+    entrypoint: ./entrypoint.sh
     volumes:
       - ./service-config/obs-studio/config:/root/.config/obs-studio
       - ./service-config/obs-studio/entrypoint.sh:/home/obs-studio/entrypoint.sh
       - ./service-config/obs-studio/scripts:/home/obs-studio/scripts
       - ./service-config/obs-studio/services:/home/obs-studio/services
       - ./service-config/obs-studio/logs:/home/obs-studio/logs
-      - ./scripts:/opt/scripts
+      - ./service-config/obs-studio/scripts:/opt/scripts
     environment:
       - DISPLAY=novnc:0.0
     ports:
-      - 5678:5678 # debugpy port for python script debugging
+      - 5699:5678 # debugpy port for python script debugging
       - 4455:4455 # websocket port
       - 2000:2000/tcp #SRT just as fallback
       - 2000:2000/udp #SRT input port
+    # deploy:
+    # resources: # https://docs.docker.com/reference/compose-file/deploy/#resources
+    #   limits:
+    #     cpus: '0.50'
+    #     memory: 50M
+    #     pids: 1
+    #   reservations:
+    #     cpus: '0.25'
+    #     memory: 20M
     healthcheck:
       test: ["CMD-SHELL", "ps aux | grep -v grep | grep 'obs' > /dev/null || exit 1"]
       interval: 10s
@@ -50,7 +60,7 @@ services:
       novnc:
         condition: service_healthy
       proxy:
-        condition: service_healthy
+        condition: service_healthy      
   novnc:  
     image: theasp/novnc:latest
     environment:
@@ -58,7 +68,7 @@ services:
       - DISPLAY_WIDTH=1600
       - DISPLAY_HEIGHT=968
       - RUN_XTERM=no
-      - RUN_FLUXBOX=no
+      # - RUN_FLUXBOX=no
     ports:
       - "8080:8080"
     healthcheck:
@@ -87,34 +97,17 @@ services:
   player:
     image: nginx:1.28.0-perl
     volumes:
-      - ./frontend/index.html:/usr/share/nginx/html/index.html
+      - ./service-config/frontend/index.html:/usr/share/nginx/html/index.html
       - ./service-config/rtmp/output:/usr/share/nginx/html/output
     ports:
       - 8088:80
-  # frontend:
-  #   image: obs-frontend:latest
-  #   entrypoint: tail -f /dev/null
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-  #     # target: builder
+  # dive:
+  #   image: wagoodman/dive:latest
   #   volumes:
-  #     - ./frontend:/app/frontend
-  #      # Order Matters: this creates an anonymous volume specifically for the node_modules directory inside the container.
-  #     - /app/frontend/node_modules
+  #     - /var/run/docker.sock:/var/run/docker.sock
   #   ports:
-  #     - "3000:3000"  # App
-  #     - "9229:9229"  # Debugging
+  #     - 9900:9900
   #   environment:
-  #     - NODE_ENV=development
-  #     - CHOKIDAR_USEPOLLING=true
-  dive:
-    image: wagoodman/dive:latest
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - 9900:9900
-    environment:
-      - DIVE_SOURCE=/var/run/docker.sock
-    entrypoint: tail -f /dev/null
+  #     - DIVE_SOURCE=/var/run/docker.sock
+  #   entrypoint: tail -f /dev/null
     # entrypoint: dive server --port 9900

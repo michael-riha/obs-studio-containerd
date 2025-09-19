@@ -126,3 +126,5 @@ echo -e "${CYAN}To detach from a session:${NC}"
 echo "  Press Ctrl+A then D"
 echo -e "\n${CYAN}To check logs:${NC}"
 echo "  cat logs/<service_name>.log"
+# Keep the container running
+exec tail -f /dev/null

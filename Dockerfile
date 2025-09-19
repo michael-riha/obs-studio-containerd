@@ -86,7 +86,7 @@ ARG OBS_PLUGIN_DEPENDANCIES="\
 #Dockerfile for building OBS-studio with two stages. 
 #If disk space isn't a problem, you could remove
 # the second stage if you you wish
-FROM ${IMAGE_VERSION} AS builder
+FROM ${IMAGE_VERSION} AS dependencies
 
 ARG TARGETARCH
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -142,10 +142,12 @@ RUN  apt-get update && apt-get install -y libnss3
 # # Link CMake binaries
 # RUN ln -s /usr/local/cmake-3.29.3-linux-x86_64/bin/* /usr/local/bin/
 
+FROM dependencies AS builder
+
 # Clone OBS Studio with a working commit for this project as of May 2025
 RUN git clone --recursive https://github.com/obsproject/obs-studio.git /home/obs-studio \
        && cd /home/obs-studio \
-       git checkout bdebea3
+       && git checkout bdebea3
 #LATEST ONE FAILED BUILD  --branch 31.0.3 
 
 # Download and extract CEF

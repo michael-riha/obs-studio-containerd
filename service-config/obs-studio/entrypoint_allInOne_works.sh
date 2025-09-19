@@ -1,61 +1,98 @@
 #!/bin/bash
-set -e
 
 # Setup shutdown logic
 trap 'trap " " SIGINT; kill -SIGINT 0; wait;' SIGINT SIGTERM
 
-# Make sure screen is installed
-command -v screen >/dev/null 2>&1 || { echo "Screen is not installed. Installing..."; apt-get update && apt-get install -y screen; }
+# Clean up any stale files
+rm -f /run/dbus/pid
+rm -f /var/run/dbus/pid
+rm -f /var/run/pulse/pid
+rm -rf /tmp/pulse-*
 
-# Create log directory
-mkdir -p /var/log/obs-services
+# Start D-Bus
+mkdir -p /var/run/dbus
+dbus-uuidgen > /var/lib/dbus/machine-id
+dbus-daemon --system --nopidfile &
+sleep 2
 
-# Set the services directory
-SERVICES_DIR="$(dirname "$0")/services"
+echo "Setting up PulseAudio..."
 
-# Make all service scripts executable
-chmod +x ${SERVICES_DIR}/*.sh
+# Create pulse user if needed
+if ! id -u pulse > /dev/null 2>&1; then
+    useradd -r -s /bin/false -d /var/run/pulse pulse
+fi
 
-# Function to start a service in a screen session with logging
-start_service() {
-    local name="$1"
-    local script="$2"
-    local logfile="/var/log/obs-services/${name}.log"
-    
-    echo "Starting $name service..."
-    # Start the service in a detached screen session, with logging
-    screen -dmS "$name" bash -c "$script 2>&1 | tee $logfile"
-    echo "$name started in screen session. View with: screen -r $name"
-    echo "Logs available at: $logfile"
-}
+# Create needed directories and set permissions
+mkdir -p /var/run/pulse
+chown -R pulse:pulse /var/run/pulse
 
-# Start services in the correct order
-start_service "dbus" "${SERVICES_DIR}/dbus-service.sh"
-sleep 2  # Give D-Bus time to start
+# Create the system.pa file without including the modules that get loaded automatically
+mkdir -p /etc/pulse
+cat > /etc/pulse/system.pa << EOF
+#!/usr/bin/pulseaudio -nF
+# Only load modules that aren't loaded automatically
+load-module module-native-protocol-unix auth-anonymous=1
+load-module module-null-sink sink_name=v1 sink_properties=device.description="Virtual_Sink"
+load-module module-null-sink sink_name=obs_output sink_properties=device.description="OBS_Output"
+set-default-sink v1
+set-default-source v1.monitor
+EOF
 
-start_service "pulseaudio" "${SERVICES_DIR}/pulseaudio-service.sh"
-sleep 3  # Give PulseAudio time to initialize
+# Kill any existing PulseAudio instances
+pkill -9 pulseaudio || true
+sleep 1
 
-# Export environment variables for other processes
+echo "Starting PulseAudio in system mode..."
+pulseaudio --system --disallow-exit --log-level=info --daemonize
+
+# Give PulseAudio time to initialize
+sleep 2
+
+# Set the environment variable for all future commands
 export PULSE_SERVER=/var/run/pulse/native
+
+# Verify PulseAudio connection
+echo "Testing PulseAudio connection..."
+if pactl info; then
+    echo "PulseAudio is working correctly!"
+    
+    # List available sinks for verification
+    echo -e "\nAvailable audio sinks:"
+    pactl list short sinks
+    
+    # List available sources for verification
+    echo -e "\nAvailable audio sources:"
+    pactl list short sources
+else
+    echo "PulseAudio connection failed."
+    exit 1
+fi
+
+echo "PulseAudio configuration complete!"
+
+# Export this for any child processes
 echo "export PULSE_SERVER=/var/run/pulse/native" >> /etc/environment
 echo "export PULSE_SERVER=/var/run/pulse/native" >> /etc/profile.d/pulse.sh
 
-# Start OBS and FFmpeg
-start_service "obs" "${SERVICES_DIR}/obs-service.sh"
-start_service "ffmpeg" "${SERVICES_DIR}/ffmpeg-service.sh"
+# Now you can start OBS with the correct environment variable
+PULSE_SERVER=/var/run/pulse/native ./install/bin/obs --studio-mode &
+# initial command which works!
+#ffmpeg -y -nostdin -f alsa -i pulse -f mpegts -codec:a mp2 http://proxy:8081/audiostream
 
-# Print instructions for accessing the screen sessions
-echo ""
-echo "All services started in screen sessions."
-echo "To list all sessions: screen -ls"
-echo "To attach to a session: screen -r [session_name]"
-echo "To detach from a session: Ctrl+A, D"
-echo ""
-echo "Log files available in /var/log/obs-services/"
+#optimized trial to become realtime
+ffmpeg -y -nostdin -f alsa -i pulse \
+       -f mpegts -codec:a mp2 \
+       -fflags nobuffer \
+       -flags low_delay \
+       -threads 1 \
+       -muxdelay 0 \
+       -muxpreload 0 \
+       -flush_packets 1 \
+       -bufsize 512k \
+       -af "aresample=async=1:first_pts=0" \
+       http://proxy:8081/audiostream
 
-# Keep checking if all services are running
-while true; do
-    # You can add service health checks here if needed
-    sleep 60
-done
+# proxy test which works!
+# ffmpeg -re -f lavfi -i 'sine=frequency=520:duration=0' -f mpegts -codec:a mp2 http://proxy:8081/audiostream
+# Keep the container running
+wait
