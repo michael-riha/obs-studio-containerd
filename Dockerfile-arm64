@@ -1,0 +1,233 @@
+# from -> https://obsproject.com/forum/attachments/dockerfile-obs-txt.104215/ 
+# original post -> https://obsproject.com/forum/threads/docker-dev-image.175843/
+ARG IMAGE_VERSION=ubuntu:24.04
+
+# https://stackoverflow.com/a/53683625 An ARG instruction goes out of scope at the end of the build stage where it was defined.
+# added by Michael Riha https://github.com/obsproject/obs-studio/wiki/build-instructions-for-linux
+# Build system dependencies
+ARG BUILD_PACKAGES="\
+    cmake \
+    extra-cmake-modules \
+    ninja-build \
+    pkg-config \ 
+    clang \
+    clang-format \
+    build-essential \ 
+    ccache \
+    git \
+    zsh"
+
+# OBS dependencies (core): 👆️ moved from core curl, ... as needed for final stage
+ARG OBS_CORE_PACKAGES="\
+    libavcodec-dev \
+    libavdevice-dev \
+    libavfilter-dev \
+    libavformat-dev \
+    libavutil-dev \
+    libswresample-dev \
+    libswscale-dev \
+    libx264-dev \
+    libcurl4-openssl-dev \
+    libmbedtls-dev \
+    libgl1-mesa-dev \
+    libjansson-dev \
+    libluajit-5.1-dev \
+    python3-dev \
+    libx11-dev \
+    libxcb-randr0-dev \
+    libxcb-shm0-dev \
+    libxcb-xinerama0-dev \
+    libxcb-composite0-dev \
+    libxcomposite-dev \
+    libxinerama-dev \
+    libxcb1-dev \
+    libx11-xcb-dev \
+    libxcb-xfixes0-dev \
+    swig \
+    libcmocka-dev \
+    libxss-dev \
+    libglvnd-dev \
+    libgles2-mesa-dev \
+    libwayland-dev \
+    librist-dev \
+    libsrt-openssl-dev \
+    libpci-dev \
+    libpipewire-0.3-dev \
+    libqrcodegencpp-dev \
+    uthash-dev \
+    curl"
+
+ARG OBS_QT6_UI="\   
+    qt6-base-dev \
+    qt6-base-private-dev \
+    qt6-svg-dev \
+    qt6-wayland \
+    qt6-image-formats-plugins"
+
+ARG OBS_PLUGIN_DEPENDANCIES="\ 
+    libasound2-dev \
+    libfdk-aac-dev \
+    libfontconfig-dev \
+    libfreetype6-dev \
+    libjack-jackd2-dev \
+    libpulse-dev \
+    libsndio-dev \
+    libspeexdsp-dev \
+    libudev-dev \
+    libv4l-dev \
+    libva-dev \
+    libvlc-dev \
+    # needs to be disabled for ARM64 support
+    # libvpl-dev \
+    libdrm-dev \
+    nlohmann-json3-dev \
+    libwebsocketpp-dev \
+    libasio-dev"
+
+#Dockerfile for building OBS-studio with two stages. 
+#If disk space isn't a problem, you could remove
+# the second stage if you you wish
+FROM ${IMAGE_VERSION} AS dependencies
+
+ARG TARGETARCH
+ENV DEBIAN_FRONTEND=noninteractive \
+    CEF_VERSION=5060
+
+# workaround since TARGETARCH is only amd64 or aarch64 but not x86_64 which is sometimes needed!
+# ARG DOWNLOAD_ARCH=$(uname -m)
+
+
+ARG BUILD_PACKAGES \
+    OBS_CORE_PACKAGES \
+    OBS_QT6_UI \
+    OBS_PLUGIN_DEPENDANCIES
+# Merge all packages into one variable
+ARG PACKAGES="${BUILD_PACKAGES} \
+            ${OBS_CORE_PACKAGES} \
+            ${OBS_QT6_UI} \
+            ${OBS_PLUGIN_DEPENDANCIES}"
+
+# Create necessary directories (deprecated /usr/local/cmake-3.29.3-linux-${ARCH})
+RUN mkdir -p /tmp /home/obs-studio 
+
+# Install curl to download nanolayer
+RUN apt-get update && apt-get install -y curl wget
+
+# Download and extract nanolayer
+RUN DOWNLOAD_ARCH=$(uname -m) && \
+    curl -L "https://github.com/devcontainers-contrib/nanolayer/releases/download/v0.5.6/nanolayer-${DOWNLOAD_ARCH}-unknown-linux-gnu.tgz" -o /tmp/nanolayer.tgz \
+    && tar -xzf /tmp/nanolayer.tgz -C /usr/bin \
+    && rm /tmp/nanolayer.tgz
+
+
+# Install base dependencies using nanolayer
+# Nanolayer is a tool that helps you keep your Dockerfile layers small.
+#It does so by automatically deleting any installation leftovers
+#(such as apt-get update lists, ppas, etc) after the installation is done.
+# https://github.com/devcontainers-contrib/nanolayer
+
+# RUN  nanolayer install apt-get ${PACKAGES}
+RUN  apt-get update && apt-get install -y ${PACKAGES}
+
+# libs missed in the official docs  https://github.com/obsproject/obs-studio/issues/10873
+RUN  apt-get update && apt-get install -y libffmpeg-nvenc-dev
+
+#libs for cef 
+RUN  apt-get update && apt-get install -y libnss3
+
+# # Download and install CMake
+# RUN wget -O /opt/cmake.sh https://github.com/Kitware/CMake/releases/download/v3.29.3/cmake-3.29.3-linux-x86_64.sh \
+#     && chmod +x /opt/cmake.sh \
+#     && /opt/cmake.sh --skip-license --prefix=/usr/local --include-subdir
+
+# # Link CMake binaries
+# RUN ln -s /usr/local/cmake-3.29.3-linux-x86_64/bin/* /usr/local/bin/
+
+FROM dependencies AS builder
+
+# Clone OBS Studio with a working commit for this project as of May 2025
+RUN git clone --recursive https://github.com/obsproject/obs-studio.git /home/obs-studio \
+       && cd /home/obs-studio \
+       && git checkout bdebea3
+#LATEST ONE FAILED BUILD  --branch 31.0.3 
+
+# Download and extract CEF
+RUN DOWNLOAD_ARCH=$(uname -m) && \
+    wget -O /tmp/cef.tar.xz https://cdn-fastly.obsproject.com/downloads/cef_binary_5060_linux_${DOWNLOAD_ARCH}_v3.tar.xz \
+    && tar -xvf /tmp/cef.tar.xz -C /home \
+    && rm /tmp/cef.tar.xz
+
+# potential preset https://github.com/obsproject/obs-studio/blob/0b7c1f7081941e2605f1c8bb7ce0907a3901a884/CMakePresets.json#L59-L79
+# CMake Vars - https://github.com/obsproject/obs-studio/wiki/building-obs-studio#cmake
+RUN DOWNLOAD_ARCH=$(uname -m) && \
+    cd /home/obs-studio && \
+        cmake --preset ubuntu -B docker-build \
+        -DENABLE_BROWSER=ON \
+        -DENABLE_BROWSER_PANELS=ON \
+        -DCEF_ROOT_DIR="/home/cef_binary_5060_linux_${DOWNLOAD_ARCH}" \
+        -DENABLE_WAYLAND=OFF \
+        # needs to be disabled for ARM64 support
+        # found here:  https://obsproject.com/forum/threads/debian-obs-studio-build-mini-howto.169680/post-684765
+        -DENABLE_QSV11=OFF \ 
+        -DQT_VERSION=6 \
+        -DENABLE_RELOCATABLE=ON \
+        -DENABLE_PORTABLE_CONFIG=ON \
+        -DCMAKE_INSTALL_PREFIX=/home/obs-studio/install 
+        # -DENABLE_PIPEWIRE=OFF \
+        # -DENABLE_AJA=0 \
+        # -DENABLE_WEBRTC=0 \
+        # 
+
+RUN cd /home/obs-studio && \
+        cmake --build ./docker-build &&\
+        cmake --install ./docker-build
+
+RUN ldconfig
+WORKDIR /home/obs-studio
+ENTRYPOINT [ "./install/bin/obs" ]
+
+
+FROM ${IMAGE_VERSION} AS obs
+
+WORKDIR /home/obs-studio
+
+ARG BUILD_PACKAGES \
+    OBS_CORE_PACKAGES \
+    OBS_QT6_UI \
+    OBS_PLUGIN_DEPENDANCIES
+# Install runtime dependencies & merge all packages into one variable
+ARG RUNTIME_PACKAGES="${OBS_CORE_PACKAGES} \
+            ${OBS_QT6_UI} \
+            ${OBS_PLUGIN_DEPENDANCIES}"
+RUN  apt-get update && apt-get install -y ${RUNTIME_PACKAGES}
+#libs for cef 
+RUN  apt-get update && apt-get install -y libnss3
+# # COPY --from=builder  /usr/local/cmake-3.29.3-linux-x86_64 /usr/local/cmake-3.29.3-linux-x86_64
+COPY --from=builder  /home/cef_binary_5060_linux_x86_64 /home/cef_binary_5060_linux_x86_64
+# # COPY --from=builder /usr/bin/nanolayer /usr/bin/nanolayer
+COPY --from=builder /home/obs-studio/install /home/obs-studio/install
+
+# for python scripting with libs
+RUN apt-get update && apt-get install -y python3-debugpy
+# RUN --mount=type=bind,source=/scripts/requirements.txt,target=requirements.txt \
+#     pip install -r requirements.txt 
+
+# https://obsproject.com/kb/launch-parameters
+ENTRYPOINT [ "./install/bin/obs", "--studio-mode" ]
+
+
+FROM obs AS audio
+
+# pulseaudio for sound
+RUN apt-get update && apt-get install -y \
+    pulseaudio \
+    ffmpeg \
+    screen \
+    --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY ./service-config/obs-studio/entrypoint.sh .
+
+FROM audio AS production
+
+ENTRYPOINT ["./entrypoint.sh"]

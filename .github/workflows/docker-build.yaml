@@ -12,7 +12,7 @@ env:
 jobs:
   build:
     name: Build Image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # https://github.com/actions/runner-images?tab=readme-ov-file#available-images
     steps:
     - name: Check out code
       uses: actions/checkout@v2
@@ -29,5 +29,5 @@ jobs:
       run: |
         echo $DOCKERHUB_USER/$IMAGE_NAME:$GITHUB_RUN_ID
         docker --version
-        docker build -t $DOCKERHUB_USER/$IMAGE_NAME:$GITHUB_RUN_ID -t $DOCKERHUB_USER/$IMAGE_NAME:latest . 
+        docker build -t $DOCKERHUB_USER/$IMAGE_NAME:$GITHUB_RUN_ID -t $DOCKERHUB_USER/$IMAGE_NAME:latest -f Dockerfile-arm64 . 
         docker push $DOCKERHUB_USER/$IMAGE_NAME --all-tags
