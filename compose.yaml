@@ -25,9 +25,9 @@ services:
       # dockerfile: Dockerfile
       dockerfile: Dockerfile-multistage
       # target: dependencies
-      target: builder
-    entrypoint: tail -f /dev/null
-    # entrypoint: ./entrypoint.sh
+      # target: builder
+    # entrypoint: tail -f /dev/null
+    entrypoint: ./entrypoint.sh
     volumes:
       - ./service-config/obs-studio/config:/root/.config/obs-studio
       - ./service-config/obs-studio/entrypoint.sh:/home/obs-studio/entrypoint.sh
@@ -98,7 +98,7 @@ services:
   player:
     image: nginx:1.28.0-perl
     volumes:
-      - ./service-config/frontend/index.html:/usr/share/nginx/html/index.html
+      - ./service-config/frontend/index.html:/usr/share/nginx/html/static/index.html
       - ./service-config/rtmp/output:/usr/share/nginx/html/output
     ports:
       - 8088:80

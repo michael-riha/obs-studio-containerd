@@ -202,8 +202,13 @@ ARG RUNTIME_PACKAGES="${OBS_CORE_PACKAGES} \
 RUN  apt-get update && apt-get install -y ${RUNTIME_PACKAGES}
 #libs for cef 
 RUN  apt-get update && apt-get install -y libnss3
+
+# Set the CEF directory based on architecture
+ARG CEF_ARCH=x86_64
+RUN export CEF_ARCH=$(uname -m)
+RUN echo COPY from architecture -> ${CEF_ARCH}
 # # COPY --from=builder  /usr/local/cmake-3.29.3-linux-x86_64 /usr/local/cmake-3.29.3-linux-x86_64
-COPY --from=builder  /home/cef_binary_5060_linux_x86_64 /home/cef_binary_5060_linux_x86_64
+COPY --from=builder  /home/cef_binary_5060_linux_${CEF_ARCH} /home/cef_binary_5060_linux_${CEF_ARCH} 
 # # COPY --from=builder /usr/bin/nanolayer /usr/bin/nanolayer
 COPY --from=builder /home/obs-studio/install /home/obs-studio/install
 
