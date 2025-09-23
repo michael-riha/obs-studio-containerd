@@ -23,7 +23,7 @@ services:
     build:
       context: .
       # dockerfile: Dockerfile
-      dockerfile: Dockerfile-arm64
+      dockerfile: Dockerfile-multistage
       # target: dependencies
       target: builder
     entrypoint: tail -f /dev/null
