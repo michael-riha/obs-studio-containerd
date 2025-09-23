@@ -155,6 +155,8 @@ RUN git clone --recursive https://github.com/obsproject/obs-studio.git /home/obs
 RUN DOWNLOAD_ARCH=$(uname -m) && \
     wget -O /tmp/cef.tar.xz https://cdn-fastly.obsproject.com/downloads/cef_binary_5060_linux_${DOWNLOAD_ARCH}_v3.tar.xz \
     && tar -xvf /tmp/cef.tar.xz -C /home \
+    # we move or rename the unarchived directory to a consistent name for multi-stage to avoid COPY ..._X86_64 or ..._arch64
+    && mv /home/cef_binary_5060_linux_${DOWNLOAD_ARCH} /home/cef_binary_5060_linux \
     && rm /tmp/cef.tar.xz
 
 # potential preset https://github.com/obsproject/obs-studio/blob/0b7c1f7081941e2605f1c8bb7ce0907a3901a884/CMakePresets.json#L59-L79
@@ -164,7 +166,8 @@ RUN DOWNLOAD_ARCH=$(uname -m) && \
         cmake --preset ubuntu -B docker-build \
         -DENABLE_BROWSER=ON \
         -DENABLE_BROWSER_PANELS=ON \
-        -DCEF_ROOT_DIR="/home/cef_binary_5060_linux_${DOWNLOAD_ARCH}" \
+        -DCEF_ROOT_DIR=/home/cef_binary_5060_linux \
+        # -DCEF_ROOT_DIR="/home/cef_binary_5060_linux_${DOWNLOAD_ARCH}" \
         -DENABLE_WAYLAND=OFF \
         # needs to be disabled for ARM64 support
         # found here:  https://obsproject.com/forum/threads/debian-obs-studio-build-mini-howto.169680/post-684765
@@ -203,12 +206,9 @@ RUN  apt-get update && apt-get install -y ${RUNTIME_PACKAGES}
 #libs for cef 
 RUN  apt-get update && apt-get install -y libnss3
 
-# Set the CEF directory based on architecture
-ARG CEF_ARCH=x86_64
-RUN export CEF_ARCH=$(uname -m)
-RUN echo COPY from architecture -> ${CEF_ARCH}
+
 # # COPY --from=builder  /usr/local/cmake-3.29.3-linux-x86_64 /usr/local/cmake-3.29.3-linux-x86_64
-COPY --from=builder  /home/cef_binary_5060_linux_${CEF_ARCH} /home/cef_binary_5060_linux_${CEF_ARCH} 
+COPY --from=builder  /home/cef_binary_5060_linux /home/cef_binary_5060_linux 
 # # COPY --from=builder /usr/bin/nanolayer /usr/bin/nanolayer
 COPY --from=builder /home/obs-studio/install /home/obs-studio/install
 
