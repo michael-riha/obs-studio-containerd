@@ -1,0 +1,53 @@
+name: Deploy to Dockerhub
+on:
+  push:
+    branches:
+      # - master
+      - feat/e2e
+
+env:
+  IMAGE_NAME: obs-studio-containerd
+  DOCKERHUB_USER: miriha
+
+jobs:
+  build:
+    name: Build Image
+    runs-on: ubuntu-24.04 # https://github.com/actions/runner-images?tab=readme-ov-file#available-images    
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Debug env
+      run: |
+        echo $DOCKER_REGISTRY/$CONTAINER_NAME/$GITHUB_RUN_ID
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ env.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    # - name: Docker meta
+    #   id: meta
+    #   uses: docker/metadata-action@v5
+    #   with:
+    #     images: ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}
+    #     tags: |
+    #       type=semver,pattern={{version}}
+    #       type=raw,value=dev,enable={{is_default_branch}}
+    - name: Build and push
+      uses: docker/build-push-action@v4
+      with:
+        platforms: linux/amd64,linux/arm64
+        context: .
+        file: Dockerfile-multistage
+        push: true
+        tags: ${{ env.DOCKERHUB_USER }}/${{ env.IMAGE_NAME }}:latest
+        # labels: ${{ steps.meta.outputs.labels }}
+        # provenance: false
+        # sbom: false
