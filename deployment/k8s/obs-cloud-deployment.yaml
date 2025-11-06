@@ -21,7 +21,8 @@ spec:
         command: ['sh', '-c', 'until wget -q --spider http://novnc.obs-cloud.svc.cluster.local:8080; do echo waiting for novnc; sleep 6; done;']
       containers:
       - name: obs-builder
-        image: obs-headless:latest
+      #TODO: fix multi-arch!
+        image: miriha/obs-studio-containerd:latest-arm64
         command: ["/bin/sh"]
         args: ["-c", "./entrypoint.sh"]
         env:
