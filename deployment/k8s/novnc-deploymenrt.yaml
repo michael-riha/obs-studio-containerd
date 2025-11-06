@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: novnc
+  namespace: obs-cloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: novnc
+  template:
+    metadata:
+      labels:
+        app: novnc
+    spec:
+      containers:
+      - name: novnc
+        image: miriha/docker-novnc:latest
+        env:
+        - name: DISPLAY_WIDTH
+          value: "1600"
+        - name: DISPLAY_HEIGHT
+          value: "968"
+        - name: RUN_XTERM
+          value: "no"
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 6
+          timeoutSeconds: 1
+          failureThreshold: 5

@@ -1,0 +1,76 @@
+# obs-builder-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: obs-builder
+  namespace: obs-cloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: obs-builder
+  template:
+    metadata:
+      labels:
+        app: obs-builder
+    spec:
+      hostname: obs
+      initContainers:
+      - name: wait-for-novnc
+        image: busybox
+        command: ['sh', '-c', 'until wget -q --spider http://novnc.obs-cloud.svc.cluster.local:8080; do echo waiting for novnc; sleep 6; done;']
+      containers:
+      - name: obs-builder
+        image: obs-headless:latest
+        command: ["/bin/sh"]
+        args: ["-c", "./entrypoint.sh"]
+        env:
+        - name: DISPLAY
+          value: "novnc.obs-cloud.svc.cluster.local:0.0"  # Using FQDN
+        ports:
+        - containerPort: 5678  # debugpy
+        - containerPort: 4455  # websocket
+        - containerPort: 2000  # SRT (TCP/UDP)
+        # volumeMounts:
+        # - name: obs-config
+        #   mountPath: /root/.config/obs-studio
+        # - name: obs-entrypoint
+        #   mountPath: /home/obs-studio/entrypoint.sh
+        #   subPath: entrypoint.sh
+        # - name: obs-scripts
+        #   mountPath: /home/obs-studio/scripts
+        # - name: obs-services
+        #   mountPath: /home/obs-studio/services
+        # - name: obs-logs
+        #   mountPath: /home/obs-studio/logs
+        # - name: opt-scripts
+        #   mountPath: /opt/scripts
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - "ps aux | grep -v grep | grep 'obs'"
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+      # volumes:
+      # - name: obs-config
+      #   persistentVolumeClaim:
+      #     claimName: obs-config-pvc
+      # - name: obs-entrypoint
+      #   persistentVolumeClaim:
+      #     claimName: obs-entrypoint-pvc
+      # - name: obs-scripts
+      #   persistentVolumeClaim:
+      #     claimName: obs-scripts-pvc
+      # - name: obs-services
+      #   persistentVolumeClaim:
+      #     claimName: obs-services-pvc
+      # - name: obs-logs
+      #   persistentVolumeClaim:
+      #     claimName: obs-logs-pvc
+      # - name: opt-scripts
+      #   persistentVolumeClaim:
+      #     claimName: obs-scripts-pvc

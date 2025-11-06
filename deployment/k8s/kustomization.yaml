@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: obs-cloud # Cross-cutting field applied to all resources
+resources:
+- namespace.yaml
+- novnc-deployment.yaml
+- novnc-service.yaml
+- obs-builder-deployment.yaml
+# - obs-builder-service.yaml # no need to explose anything from this container yet!
