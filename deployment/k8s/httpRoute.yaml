@@ -19,19 +19,3 @@ spec:
     backendRefs:
     - name: novnc
       port: 8080
-
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: novnc-httproute
-  namespace: obs-cloud
-spec:
-  parentRefs:
-  - name: your-gateway-name # 🔁 Replace with your actual Gateway name
-    namespace: traefik # 🎯 Likely needed if Gateway is in another namespace
-  hostnames:
-  - "obs.oke.bey.media" # 🌐 Your custom hostname
-  rules:
-  - backendRefs:
-    - name: novnc
-      port: 8080
