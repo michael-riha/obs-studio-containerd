@@ -23,6 +23,7 @@ spec:
       - name: obs-builder
       #TODO: fix multi-arch!
         image: miriha/obs-studio-containerd:latest-arm64
+        imagePullPolicy: Always
         command: ["/bin/sh"]
         args: ["-c", "./entrypoint.sh"]
         env:
