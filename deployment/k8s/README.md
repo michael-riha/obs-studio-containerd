@@ -10,3 +10,6 @@
 
 `kubectl logs svc/novnc -n obs-cloud -f`
 `kubectl exec -it dnsutils -n obs-cloud -- nslookup novnc`
+
+`kubectl logs deployment.apps/obs-builder -n obs-cloud -f`
+`kubectl exec --stdin --tty pod/obs-builder-6db6858c79-gzhbc -n obs-cloud -- /bin/bash`

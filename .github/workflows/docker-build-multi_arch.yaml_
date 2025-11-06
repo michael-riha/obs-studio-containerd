@@ -1,4 +1,4 @@
-name: Deploy to Dockerhub
+name: Deploy multi-arch (AMD64 and ARM64) as one image to Dockerhub
 # TODO: fix Error: 
 # works on two deployments (arm & amd): https://github.com/michael-riha/obs-studio-containerd/actions/runs/19102391301
 # NOT worked on one multi-arch (arm+amd): https://github.com/michael-riha/obs-studio-containerd/actions/runs/19102391300

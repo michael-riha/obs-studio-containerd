@@ -25,6 +25,8 @@ spec:
           value: "no"
         ports:
         - containerPort: 8080
+        - containerPort: 5900  # VNC port
+        - containerPort: 6000  # X11 port
         livenessProbe:
           httpGet:
             path: /
