@@ -232,6 +232,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY ./service-config/obs-studio/entrypoint.sh .
+COPY ./service-config/obs-studio/services ./services
 
 FROM audio AS production
 

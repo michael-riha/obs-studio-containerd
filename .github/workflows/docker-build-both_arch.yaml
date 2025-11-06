@@ -1,9 +1,12 @@
 name: Deploy to Dockerhub
-on:
-  push:
-    branches:
-      # - master
-      - feat/e2e
+# TODO: fix Error: 
+# works on two deployments (arm & amd): https://github.com/michael-riha/obs-studio-containerd/actions/runs/19102391301
+# NOT worked on one multi-arch (arm+amd): https://github.com/michael-riha/obs-studio-containerd/actions/runs/19102391300
+# on:
+#   push:
+#     branches:
+#       # - master
+#       - feat/e2e
 
 env:
   IMAGE_NAME: obs-studio-containerd
