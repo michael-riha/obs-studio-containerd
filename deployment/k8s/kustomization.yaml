@@ -5,5 +5,5 @@ resources:
 - namespace.yaml
 - novnc-deployment.yaml
 - novnc-service.yaml
-- obs-builder-deployment.yaml
+- obs-cloud-deployment.yaml
 # - obs-builder-service.yaml # no need to explose anything from this container yet!
